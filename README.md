@@ -1,1 +1,2 @@
-# RVt-Practice-order-managements-system
+# java-console
+project template for Java CLI app
