@@ -5,5 +5,7 @@ public class UserInterfaceSelector {
         UserInterfaces gui = new UserInterfaces();
 
         gui.mainMenu();
+        
+        Database.connect();
     }
 }
