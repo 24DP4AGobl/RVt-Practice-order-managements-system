@@ -1,6 +1,8 @@
 package rvt;
 
 import javax.swing.*;
+import javax.swing.text.AbstractDocument.Content;
+
 import java.awt.*;
 
 public class UserInterfaces{
@@ -60,43 +62,34 @@ public class UserInterfaces{
         frame.setSize(1000, 1000);
 
         JPanel mainPanel = new JPanel();
-        mainPanel.setBounds(200, 0, 700, 900);
 
         BoxLayout boxLayoutManager = new BoxLayout(mainPanel, BoxLayout.Y_AXIS);
 		mainPanel.setLayout(boxLayoutManager);
 
         JLabel title = new JLabel("Pievienojiet jaunu pasūtījumu");
-        title.setFont(new Font("Serif", Font.BOLD, 50));
+        title.setFont(new Font("Arial", Font.BOLD, 50));
+        title.setSize(300, 30);
         title.setAlignmentX(Component.CENTER_ALIGNMENT);
-
-        JPanel dataInputPanel = new JPanel();
-        dataInputPanel.setLayout(new BoxLayout(dataInputPanel, BoxLayout.Y_AXIS));
-
-        JPanel order_id = inputPanel("pasutijums_id");
-        JPanel date = inputPanel("datums");
-        JPanel summa = inputPanel("summa");
-
-        JPanel panelStatus = new JPanel();
-        JLabel labelStatus = new JLabel("statuss");
-        labelStatus.setFont(new Font("Serif", Font.BOLD, 25));
-
-        String[] statusOptions = {"Izpildīts", "Procesā"};
-        JComboBox<String> statusBox = new JComboBox<>(statusOptions);
-        
-        panelStatus.add(labelStatus);
-        panelStatus.add(statusBox);
-
-        JPanel worker_id = inputPanel("darbinieka_id");
-
-        dataInputPanel.add(order_id);
-        dataInputPanel.add(date);
-        dataInputPanel.add(summa);
-        dataInputPanel.add(panelStatus);
-        dataInputPanel.add(worker_id);
-
         mainPanel.add(title);
-        mainPanel.add(Box.createRigidArea(new Dimension(0, 50)));
-        mainPanel.add(dataInputPanel);
+
+        JPanel inputGroup = new JPanel();
+        inputGroup.setSize(300, 30);
+        inputGroup.setLayout(new BoxLayout(inputGroup, BoxLayout.Y_AXIS));
+
+        inputGroup.add(inputGroup("Pasutijuma_id"));
+        inputGroup.add(inputGroup("Datums"));
+        inputGroup.add(inputGroup("Summa"));
+
+        String[] statusOptions = {"izpildīts", "Procesā"};
+        inputGroup.add(comboBoxGroup("Statuss", statusOptions));
+
+        String[] delivererOptions = {""};
+        inputGroup.add(comboBoxGroup("Piegadataja_id", delivererOptions));
+
+        String[] workersOptions = {""};
+        inputGroup.add(comboBoxGroup("Darbinieka_id", workersOptions));
+
+        mainPanel.add(inputGroup);
 
         JPanel wrapper = new JPanel(new GridBagLayout());
         wrapper.add(mainPanel);
@@ -115,17 +108,35 @@ public class UserInterfaces{
         return button;
     }
 
-    private static JPanel inputPanel(String title) {
-        Dimension dimension = new Dimension(150, 25);
-        JPanel panel = new JPanel();
-        JLabel label = new JLabel(title);
+    private static JPanel inputGroup(String title) {
+        JPanel inputPanel = new JPanel();
+        inputPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
 
-        panel.add(label);
-        label.setFont(new Font("Serif", Font.BOLD, 25));
+        JLabel label = new JLabel(title);
+        label.setFont(new Font("Arial", Font.BOLD, 40));
+        label.setSize(100, 50);
+        inputPanel.add(label);
+
         JTextArea area = new JTextArea();
-        area.setFont(new Font("Serif", Font.PLAIN, 20));
-        area.setPreferredSize(dimension);
-        panel.add(area);
+        area.setFont(new Font("Arial", Font.PLAIN, 40));
+        area.setLineWrap(true);
+        area.setSize(200, 50);
+        area.setAlignmentX(Component.LEFT_ALIGNMENT);
+        inputPanel.add(area);
+
+        return inputPanel;
+    }
+
+    private static JPanel comboBoxGroup(String title, String[] options) {
+        JPanel panel = new JPanel();
+        panel.setLayout(new FlowLayout(FlowLayout.LEFT));
+        JLabel label = new JLabel(title);
+        label.setFont(new Font("Arial", Font.BOLD, 40));
+        label.setSize(100, 50);
+        panel.add(label);
+
+        JComboBox<String> comboBox = new JComboBox<>(options);
+        panel.add(comboBox);
 
         return panel;
     }
