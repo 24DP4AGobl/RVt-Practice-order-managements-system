@@ -2,10 +2,9 @@ package rvt;
 
 public class UserInterfaceSelector {
     public static void main(String[] args){
-        UserInterfaces gui = new UserInterfaces();
+        Database.createTables();
 
-        gui.mainMenu();
-        
-        Database.connect();
+        UserInterfaces gui = new UserInterfaces();
+        gui.userSelect();
     }
 }
