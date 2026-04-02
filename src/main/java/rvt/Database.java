@@ -1,8 +1,6 @@
 package rvt;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
+import java.sql.*;
 
 public class Database {
     public static Connection connect() {
@@ -10,12 +8,25 @@ public class Database {
     
         try {
             Connection conn = DriverManager.getConnection(url);
-            System.out.println("Connected to SQLite successfully!");
             return conn;
         } catch (SQLException e) {
-            System.out.println("Connection failed:");
             System.out.println(e.getMessage());
             return null;
+        }
+    }
+
+    public static void createTables() {
+        String sql = "CREATE TABLE IF NOT EXISTS darbinieki ("
+                   + "id INTEGER PRIMARY KEY,"
+                   + "vards TEXT,"
+                   + "uzvards TEXT,"
+                   + "amats TEXT)";
+
+        try (Connection conn = connect();
+             Statement stmt = conn.createStatement()) {
+            stmt.execute(sql);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 }
