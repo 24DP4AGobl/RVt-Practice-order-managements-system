@@ -162,7 +162,7 @@ public class UserInterfaces {
         frame.setVisible(true);
     }
 
-    /* ===================== ADD ORDER WINDOW ===================== */
+    /* ===================== ADD AN ORDER WINDOW ===================== */
 
     private void windowAddOrder() {
         JFrame frame = new JFrame("Pievienot pasūtījumu");
@@ -179,17 +179,25 @@ public class UserInterfaces {
         inputGroup.setLayout(new BoxLayout(inputGroup, BoxLayout.Y_AXIS));
 
         inputGroup.add(inputGroup("Pasutijuma_id"));
+        inputGroup.add(Box.createRigidArea(new Dimension(0, 20)));
         inputGroup.add(inputGroup("Datums"));
+        inputGroup.add(Box.createRigidArea(new Dimension(0, 20)));
         inputGroup.add(inputGroup("Summa"));
 
         String[] statusOptions = {"Izpildīts", "Procesā"};
+        inputGroup.add(Box.createRigidArea(new Dimension(0, 20)));
         inputGroup.add(comboBoxGroup("Statuss", statusOptions));
 
+        inputGroup.add(Box.createRigidArea(new Dimension(0, 20)));
         inputGroup.add(comboBoxGroup("Piegadataja_id", new String[]{""}));
-        inputGroup.add(comboBoxGroup("Darbinieka_id", new String[]{""}));
+
+        JPanel confirmGroup = confirmCancelGroup("Cancel", frame);
+
+        inputGroup.add(Box.createRigidArea(new Dimension(0, 30)));
+        inputGroup.add(confirmGroup);
 
         mainPanel.add(title);
-        mainPanel.add(Box.createRigidArea(new Dimension(0, 50)));
+        mainPanel.add(Box.createRigidArea(new Dimension(0, 30)));
         mainPanel.add(inputGroup);
 
         JPanel wrapper = new JPanel(new GridBagLayout());
@@ -295,31 +303,51 @@ public class UserInterfaces {
     }
 
     private static JPanel inputGroup(String title) {
-        JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        JPanel panel = new JPanel(new BorderLayout(5, 5));
 
         JLabel label = new JLabel(title);
         label.setFont(new Font("Arial", Font.BOLD, 40));
 
-        JTextArea area = new JTextArea();
+        JTextField area = new JTextField();
         area.setFont(new Font("Arial", Font.PLAIN, 40));
         area.setPreferredSize(new Dimension(200, 50));
 
-        panel.add(label);
-        panel.add(area);
+        panel.add(label, BorderLayout.WEST);
+        panel.add(area, BorderLayout.EAST);
 
         return panel;
     }
 
     private static JPanel comboBoxGroup(String title, String[] options) {
-        JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        JPanel panel = new JPanel(new BorderLayout(5, 5));
 
         JLabel label = new JLabel(title);
         label.setFont(new Font("Arial", Font.BOLD, 40));
 
         JComboBox<String> comboBox = new JComboBox<>(options);
 
-        panel.add(label);
-        panel.add(comboBox);
+        panel.add(label, BorderLayout.WEST);
+        panel.add(comboBox, BorderLayout.EAST);
+
+        return panel;
+    }
+
+    private static JPanel confirmCancelGroup(String secButtonName, Frame frame) {
+        JPanel panel = new JPanel(new BorderLayout(5, 5));
+        Dimension buttonSize = new Dimension(150, 50);
+        Color secColor = new Color(224, 86, 76);
+
+        JButton confirm = new JButton("confirm");
+        confirm.setPreferredSize(buttonSize);
+
+        JButton secButton = new JButton(secButtonName);
+        secButton.addActionListener(e -> frame.dispose());
+        secButton.setPreferredSize(buttonSize);
+        secButton.setBackground(secColor);
+        secButton.setForeground(Color.white);
+
+        panel.add(confirm, BorderLayout.WEST);
+        panel.add(secButton, BorderLayout.EAST);
 
         return panel;
     }
