@@ -6,12 +6,12 @@ import java.sql.*;
 
 public class UserInterfaces {
 
+    String currentEmployeeID;
+
     /* ===================== USER SELECTION ===================== */
 
     public void userSelect() {
-        JFrame frame = new JFrame("Lietotāja izvēle");
-        frame.setSize(600, 400);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        JFrame frame = WindowFormat("Lietotāja izvēle", true);
 
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
@@ -34,7 +34,7 @@ public class UserInterfaces {
 
             if (ok == JOptionPane.OK_OPTION) {
                 String password = new String(pf.getPassword());
-                if ("parole1".equals(password)) {
+                if ("test".equals(password)) {
                     frame.dispose();
                     mainMenu(true);
                 } else {
@@ -54,8 +54,7 @@ public class UserInterfaces {
     }
 
     private void selectEmployee() {
-        JFrame frame = new JFrame("Darbinieki");
-        frame.setSize(600, 400);
+        JFrame frame = WindowFormat("Darbinieki", true);
 
         DefaultListModel<String> model = new DefaultListModel<>();
 
@@ -86,6 +85,8 @@ public class UserInterfaces {
                     if (!list.isSelectionEmpty()) {
                         frame.dispose();
                         mainMenu(false);
+
+                        currentEmployeeID = list.getSelectedValue().split(" - ")[0];
                     }
                 });
 
@@ -104,9 +105,7 @@ public class UserInterfaces {
     /* ===================== MAIN MENU ===================== */
 
     public void mainMenu(boolean isAdmin) {
-        JFrame frame = new JFrame("Pasūtījumu uzskaites sistēma");
-        frame.setSize(1000, 1000);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        JFrame frame = WindowFormat("Pasūtījumu uzskaites sistēma", true);
 
         JPanel mainPanel = new JPanel();
         mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
@@ -121,6 +120,8 @@ public class UserInterfaces {
         JButton viewOrders = buttonFormat("Apskatīt visus pasūtījumus");
         JButton editOrders = buttonFormat("Rediģēt pasūtījumus");
         JButton products = buttonFormat("Apskatīt produktus");
+        JButton UserReselection = buttonFormat("Mainīt lietotājus");
+        UserReselection.addActionListener(e -> {userSelect(); frame.dispose();});
 
         JLabel warning = new JLabel("Brīdinājums");
         warning.setFont(new Font("Serif", Font.BOLD, 40));
@@ -139,8 +140,9 @@ public class UserInterfaces {
         mainPanel.add(editOrders);
         mainPanel.add(Box.createRigidArea(new Dimension(0, 20)));
         mainPanel.add(products);
-        mainPanel.add(Box.createRigidArea(new Dimension(0, 50)));
-        mainPanel.add(warningContainer);
+        mainPanel.add(Box.createRigidArea(new Dimension(0, 20)));
+        mainPanel.add(UserReselection);
+
 
         if (isAdmin) {
             JButton addEmployee = buttonFormat("Pievienot darbinieku");
@@ -149,11 +151,19 @@ public class UserInterfaces {
             JButton removeEmployee = buttonFormat("Noņemt darbinieku");
             removeEmployee.addActionListener(e -> removeEmployeeWindow());
 
+            JButton editEmployee = buttonFormat("Rediģēt darbinieku");
+            editEmployee.addActionListener(e -> editEmployeeWindow());
+
             mainPanel.add(Box.createRigidArea(new Dimension(0, 20)));
             mainPanel.add(addEmployee);
             mainPanel.add(Box.createRigidArea(new Dimension(0, 20)));
             mainPanel.add(removeEmployee);
+            mainPanel.add(Box.createRigidArea(new Dimension(0, 20)));
+            mainPanel.add(editEmployee);
         }
+
+        mainPanel.add(Box.createRigidArea(new Dimension(0, 50)));
+        mainPanel.add(warningContainer);
 
         JPanel wrapper = new JPanel(new GridBagLayout());
         wrapper.add(mainPanel);
@@ -165,8 +175,7 @@ public class UserInterfaces {
     /* ===================== ADD AN ORDER WINDOW ===================== */
 
     private void windowAddOrder() {
-        JFrame frame = new JFrame("Pievienot pasūtījumu");
-        frame.setSize(1000, 1000);
+        JFrame frame = WindowFormat("Pievienot pasūtījumu", false);
 
         JPanel mainPanel = new JPanel();
         mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
@@ -237,15 +246,13 @@ public class UserInterfaces {
 
                 JOptionPane.showMessageDialog(null, "Saglabāts!");
             } catch (Exception e) {
-                JOptionPane.showMessageDialog(null, "Kļūda!");
+                JOptionPane.showMessageDialog(null, "ID jau tiek izmantots, vai ir ievadīts!");
             }
         }
     }
 
     private void removeEmployeeWindow() {
-        JFrame frame = new JFrame("Noņemt darbinieku");
-        frame.setSize(600, 400);
-
+        JFrame frame = WindowFormat("Noņemt darbinieku", false);
         DefaultListModel<String> model = new DefaultListModel<>();
 
         try (Connection dbConn = Database.connect();
@@ -283,7 +290,24 @@ public class UserInterfaces {
 
             frame.setLayout(new BorderLayout());
             frame.add(new JScrollPane(list), BorderLayout.CENTER);
-            frame.add(removeBtn, BorderLayout.SOUTH);
+            JButton cancelBtn = new JButton("Cancel");
+            cancelBtn.setPreferredSize(new Dimension(0, 50));
+            cancelBtn.setMaximumSize(new Dimension(Integer.MAX_VALUE, 50));
+            cancelBtn.setBackground(new Color(224, 86, 76));
+            cancelBtn.setForeground(Color.WHITE);
+            cancelBtn.addActionListener(e -> frame.dispose());
+
+            removeBtn.setPreferredSize(new Dimension(0, 50));
+            removeBtn.setMaximumSize(new Dimension(Integer.MAX_VALUE, 50));
+
+            JPanel bottomPanel = new JPanel();
+            bottomPanel.setLayout(new BoxLayout(bottomPanel, BoxLayout.Y_AXIS));
+
+            bottomPanel.add(removeBtn);
+            bottomPanel.add(cancelBtn);
+
+            frame.add(bottomPanel, BorderLayout.SOUTH);
+            
 
         } catch (SQLException ex) {
             ex.printStackTrace();
@@ -291,6 +315,126 @@ public class UserInterfaces {
 
         frame.setVisible(true);
     }
+
+    private void editEmployeeWindow() {
+        JFrame frame = WindowFormat("Darbinieki", true);
+    
+        DefaultListModel<String> model = new DefaultListModel<>();
+    
+        try (Connection conn = Database.connect();
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery("SELECT * FROM darbinieki")) {
+    
+            boolean empty = true;
+            while (rs.next()) {
+                empty = false;
+                String text = rs.getInt("id") + " - " +
+                        rs.getString("vards") + " " +
+                        rs.getString("uzvards") + " (" +
+                        rs.getString("amats") + ")";
+                model.addElement(text);
+            }
+    
+            if (empty) {
+                JLabel label = new JLabel("Darbinieku nav :(");
+                label.setFont(new Font("Serif", Font.BOLD, 25));
+                label.setHorizontalAlignment(SwingConstants.CENTER);
+                frame.add(label);
+            } else {
+                JList<String> list = new JList<>(model);
+    
+                JButton selectBtn = new JButton("Rediģēt");
+                selectBtn.setPreferredSize(new Dimension(0, 50));
+                selectBtn.setMaximumSize(new Dimension(Integer.MAX_VALUE, 50));
+
+                JButton cancelBtn = new JButton("Cancel");
+                cancelBtn.setPreferredSize(new Dimension(0, 50));
+                cancelBtn.setMaximumSize(new Dimension(Integer.MAX_VALUE, 50));
+                cancelBtn.setBackground(new Color(224, 86, 76));
+                cancelBtn.setForeground(Color.WHITE);
+                cancelBtn.addActionListener(e -> frame.dispose());
+    
+                JPanel bottomPanel = new JPanel();
+                bottomPanel.setLayout(new BoxLayout(bottomPanel, BoxLayout.Y_AXIS));
+                bottomPanel.add(selectBtn);
+                bottomPanel.add(cancelBtn);
+    
+                frame.setLayout(new BorderLayout());
+                frame.add(new JScrollPane(list), BorderLayout.CENTER);
+                frame.add(bottomPanel, BorderLayout.SOUTH);
+    
+                selectBtn.addActionListener(e -> {
+                    if (!list.isSelectionEmpty()) {
+                        String selected = list.getSelectedValue();
+                        int id = Integer.parseInt(selected.split(" - ")[0]);
+    
+                        JTextField vardsField = new JTextField();
+                        JTextField uzvardsField = new JTextField();
+                        JTextField amatsField = new JTextField();
+    
+                        try (Connection conn2 = Database.connect()) {
+                            String sql = "SELECT * FROM darbinieki WHERE id=?";
+                            PreparedStatement pstmt = conn2.prepareStatement(sql);
+                            pstmt.setInt(1, id);
+                            ResultSet rs2 = pstmt.executeQuery();
+    
+                            if (rs2.next()) {
+                                vardsField.setText(rs2.getString("vards"));
+                                uzvardsField.setText(rs2.getString("uzvards"));
+                                amatsField.setText(rs2.getString("amats"));
+                            }
+                        } catch (SQLException ex) {
+                            ex.printStackTrace();
+                        }
+    
+                        Object[] fields = {
+                                "Vārds:", vardsField,
+                                "Uzvārds:", uzvardsField,
+                                "Amats:", amatsField
+                        };
+    
+                        int option = JOptionPane.showConfirmDialog(null, fields, "Rediģēt darbinieku", JOptionPane.OK_CANCEL_OPTION);
+    
+                        if (option == JOptionPane.OK_OPTION) {
+                            String vards = vardsField.getText();
+                            String uzvards = uzvardsField.getText();
+                            String amats = amatsField.getText();
+    
+                            if (vards.isEmpty() || uzvards.isEmpty() || amats.isEmpty()) {
+                                JOptionPane.showMessageDialog(null, "Aizpildi visus laukus!");
+                                return;
+                            }
+    
+                            try (Connection conn3 = Database.connect()) {
+                                String sql = "UPDATE darbinieki SET vards=?, uzvards=?, amats=? WHERE id=?";
+                                PreparedStatement pstmt = conn3.prepareStatement(sql);
+    
+                                pstmt.setString(1, vards);
+                                pstmt.setString(2, uzvards);
+                                pstmt.setString(3, amats);
+                                pstmt.setInt(4, id);
+    
+                                pstmt.executeUpdate();
+    
+                                JOptionPane.showMessageDialog(null, "Darbinieks atjaunināts!");
+    
+                                model.set(list.getSelectedIndex(),
+                                        id + " - " + vards + " " + uzvards + " (" + amats + ")");
+                            } catch (SQLException ex) {
+                                ex.printStackTrace();
+                            }
+                        }
+                    }
+                });
+            }
+    
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    
+        frame.setVisible(true);
+    }
+
 
     /* ===================== UI HELPERS ===================== */
 
@@ -350,5 +494,15 @@ public class UserInterfaces {
         panel.add(secButton, BorderLayout.EAST);
 
         return panel;
+    }
+        private static JFrame WindowFormat(String title, Boolean exitOnClose) {
+            JFrame frame = new JFrame(title);
+            frame.pack();
+            frame.setSize(1000, 1000);
+            if(exitOnClose){
+                frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            }
+            frame.setLocationRelativeTo(null);
+            return frame;
     }
 }
