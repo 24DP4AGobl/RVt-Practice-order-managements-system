@@ -165,7 +165,23 @@ public class UserInterfaces extends ElementFormatting{
 
                 frame.setLayout(new BorderLayout());
                 frame.add(new JScrollPane(list), BorderLayout.CENTER);
-                frame.add(selectBtn, BorderLayout.SOUTH);
+                JButton cancelBtn = new JButton("Cancel");
+            cancelBtn.setPreferredSize(new Dimension(0, 50));
+            cancelBtn.setMaximumSize(new Dimension(Integer.MAX_VALUE, 50));
+            cancelBtn.setBackground(new Color(224, 86, 76));
+            cancelBtn.setForeground(Color.WHITE);
+            cancelBtn.addActionListener(e -> frame.dispose());
+
+            selectBtn.setPreferredSize(new Dimension(0, 50));
+            selectBtn.setMaximumSize(new Dimension(Integer.MAX_VALUE, 50));
+
+            JPanel bottomPanel = new JPanel();
+            bottomPanel.setLayout(new BoxLayout(bottomPanel, BoxLayout.Y_AXIS));
+
+            bottomPanel.add(selectBtn);
+            bottomPanel.add(cancelBtn);
+
+            frame.add(bottomPanel, BorderLayout.SOUTH);
             }
         } catch (Exception e) {
             e.printStackTrace();
