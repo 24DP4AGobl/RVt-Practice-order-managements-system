@@ -3,29 +3,40 @@ package rvt;
 import java.sql.*;
 
 public class Database {
-    public static Connection connect() {
-        String url = "jdbc:sqlite:sample.db";
-    
-        try {
-            Connection conn = DriverManager.getConnection(url);
-            return conn;
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
-            return null;
-        }
+
+    private static final String URL = "jdbc:sqlite:data/sample.db";
+
+    public static Connection connect() throws SQLException {
+        return DriverManager.getConnection(URL);
     }
 
     public static void createTables() {
-        String sql = "CREATE TABLE IF NOT EXISTS darbinieki ("
-                   + "id INTEGER PRIMARY KEY,"
-                   + "vards TEXT,"
-                   + "uzvards TEXT,"
-                   + "amats TEXT)";
+        String darbiniekiTable = "CREATE TABLE IF NOT EXISTS darbinieki ("
+                + "id INTEGER PRIMARY KEY,"
+                + "vards TEXT,"
+                + "uzvards TEXT,"
+                + "amats TEXT)";
+
+        // String ordersTable = "CREATE TABLE IF NOT EXISTS orders ("
+        //        + "pasutijuma_id INTEGER PRIMARY KEY,"
+        //        + "datums DATETIME,"
+        //        + "summa DECIMAL(10,2),"
+        //        + "statuss VARCHAR(20))";
+
+        String delivererTable = "CREATE TABLE IF NOT EXISTS deliverer ("
+                + "piegadataja_id INTEGER PRIMARY KEY,"
+                + "nosaukums VARCHAR(100),"
+                + "talrunis VARCHAR(15),"
+                + "emails VARCHAR(100))";
 
         try (Connection conn = connect();
              Statement stmt = conn.createStatement()) {
-            stmt.execute(sql);
-        } catch (Exception e) {
+
+            stmt.execute(darbiniekiTable);
+        //    stmt.execute(ordersTable);
+            stmt.execute(delivererTable);
+
+        } catch (SQLException e) {
             e.printStackTrace();
         }
     }
