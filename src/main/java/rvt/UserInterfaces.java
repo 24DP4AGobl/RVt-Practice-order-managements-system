@@ -73,9 +73,24 @@ public class UserInterfaces extends ElementFormatting{
         JButton UserReselection = buttonFormat("Mainīt lietotājus");
         UserReselection.addActionListener(e -> {userSelect(); frame.dispose();});
 
-        JLabel warning = new JLabel("Brīdinājums");
+        JLabel warning = new JLabel();
         warning.setFont(new Font("Serif", Font.BOLD, 40));
         warning.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        JPanel warningContainer = new JPanel();
+        warningContainer.setLayout(new FlowLayout(FlowLayout.CENTER));
+
+        if (adminUI.isLowStock()) {
+            warning.setText("Maz produktu palicis noliktuvē!!");
+            warning.setForeground(Color.black);
+            warningContainer.setBackground(Color.RED);
+        } else {
+            warning.setText("Noliktuvē ir pietiekami produkti.");
+            warning.setForeground(Color.black);
+            warningContainer.setBackground(new Color(220, 255, 220));
+        }
+
+        warningContainer.add(warning);
 
         JButton productsBtn = buttonFormat("Produkti un krājumi");
         productsBtn.addActionListener(e -> adminUI.productWindow()); // Atver produktu logu
@@ -97,10 +112,6 @@ public class UserInterfaces extends ElementFormatting{
 
         JButton editDeliverer = buttonFormat("Rediģēt piegādātāju");
         editDeliverer.addActionListener(e -> adminUI.delivererWindowFunctionality("edit"));
-
-        JPanel warningContainer = new JPanel();
-        warningContainer.add(warning);
-        warningContainer.setBackground(Color.RED);
 
         mainPanel.add(title);
         mainPanel.add(Box.createRigidArea(new Dimension(0, 20)));
@@ -217,15 +228,26 @@ public class UserInterfaces extends ElementFormatting{
         products.addActionListener(e -> employeeUI.productViewOnlyWindow());
 
         JButton UserReselection = buttonFormat("Mainīt lietotājus");
-        UserReselection.addActionListener(e -> userSelect());
+        UserReselection.addActionListener(e -> {userSelect(); frame.dispose();});
 
-        JLabel warning = new JLabel("Brīdinājums");
+        JLabel warning = new JLabel();
         warning.setFont(new Font("Serif", Font.BOLD, 40));
         warning.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         JPanel warningContainer = new JPanel();
+        warningContainer.setLayout(new FlowLayout(FlowLayout.CENTER));
+
+        if (adminUI.isLowStock()) {
+            warning.setText("Maz produktu palicis noliktuvē!!");
+            warning.setForeground(Color.black);
+            warningContainer.setBackground(Color.RED);
+        } else {
+            warning.setText("Noliktuvē ir pietiekami produkti.");
+            warning.setForeground(Color.black);
+            warningContainer.setBackground(new Color(220, 255, 220));
+        }
+
         warningContainer.add(warning);
-        warningContainer.setBackground(Color.RED);
 
         mainPanel.add(title);
         mainPanel.add(Box.createRigidArea(new Dimension(0, 50)));
