@@ -32,13 +32,23 @@ public class Database {
                 + "talrunis VARCHAR(15),"
                 + "emails VARCHAR(100))";
 
+        String productTable = "CREATE TABLE IF NOT EXISTS products ("
+                + "produkts_id INTEGER PRIMARY KEY,"
+                + "nosaukums TEXT NOT NULL,"
+                + "cena REAL NOT NULL,"
+                + "kategorija TEXT,"
+                + "daudzums INTEGER,"
+                + "piegadatajs_id INTEGER,"
+                + "FOREIGN KEY (piegadatajs_id) REFERENCES deliverer(piegadataja_id))"; 
+
         try (Connection conn = connect();
              Statement stmt = conn.createStatement()) {
 
             stmt.execute(darbiniekiTable);
             stmt.execute(ordersTable);
             stmt.execute(delivererTable);
-            //stmt.execute("DROP TABLE orders;");
+            stmt.execute(productTable);
+
         } catch (SQLException e) {
             e.printStackTrace();
         }
