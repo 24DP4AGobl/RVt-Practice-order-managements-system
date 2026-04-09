@@ -23,7 +23,10 @@ public class Database {
                 + "summa DECIMAL(10,2),"
                 + "statuss VARCHAR(20),"
                 + "darbinieks_id INTEGER,"
-                + "FOREIGN KEY(darbinieks_id) REFERENCES darbinieki(id)"
+                + "produkts_id,"
+                + "gab,"
+                + "FOREIGN KEY(darbinieks_id) REFERENCES darbinieki(id),"
+                + "FOREIGN KEY(produkta_id) REFERENCES products(produkts_id)"
                 + ")";
 
         String delivererTable = "CREATE TABLE IF NOT EXISTS deliverer ("
@@ -48,7 +51,6 @@ public class Database {
             stmt.execute(ordersTable);
             stmt.execute(delivererTable);
             stmt.execute(productTable);
-
         } catch (SQLException e) {
             e.printStackTrace();
         }
