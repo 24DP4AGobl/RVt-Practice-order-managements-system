@@ -214,6 +214,8 @@ public class UserInterfaces extends ElementFormatting{
         manageOrders.addActionListener(e -> employeeUI.orderWindow(currentEmployeeID));
 
         JButton products = buttonFormat("Apskatīt produktus");
+        products.addActionListener(e -> employeeUI.productViewOnlyWindow());
+
         JButton UserReselection = buttonFormat("Mainīt lietotājus");
         UserReselection.addActionListener(e -> userSelect());
 

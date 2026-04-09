@@ -141,6 +141,68 @@ public class EmployeeInterface extends ElementFormatting{
         frame.setVisible(true);
     }
 
+    public void productViewOnlyWindow() {
+        JFrame frame = WindowFormat("Produkti", true);
+    
+        DefaultListModel<String> model = new DefaultListModel<>();
+    
+        try (Connection conn = Database.connect();
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(
+                     "SELECT p.*, d.nosaukums AS piegadatajs " +
+                     "FROM products p LEFT JOIN deliverer d " +
+                     "ON p.piegadatajs_id = d.piegadataja_id")) {
+    
+            boolean empty = true;
+    
+            while (rs.next()) {
+                empty = false;
+    
+                String deliverer = rs.getString("piegadatajs");
+                if (deliverer == null) deliverer = "Nav";
+    
+                String text = rs.getInt("produkts_id") + " - " +
+                        rs.getString("nosaukums") + " | " +
+                        rs.getBigDecimal("cena") + " | " +
+                        rs.getString("kategorija") + " | " +
+                        rs.getInt("daudzums") + " gab | " +
+                        deliverer;
+    
+                model.addElement(text);
+            }
+    
+            frame.setLayout(new BorderLayout());
+    
+            JComponent centerComponent;
+    
+            if (empty) {
+                JLabel label = new JLabel("Produktu nav :(");
+                label.setFont(new Font("Serif", Font.BOLD, 25));
+                label.setHorizontalAlignment(SwingConstants.CENTER);
+                centerComponent = label;
+            } else {
+                JList<String> list = new JList<>(model);
+                list.setFont(new Font("Arial", Font.PLAIN, 25));
+                centerComponent = new JScrollPane(list);
+            }
+    
+            JButton cancelBtn = buttonFormat("Atcelt");
+            cancelBtn.addActionListener(e -> frame.dispose());
+    
+            JPanel bottomPanel = new JPanel();
+            bottomPanel.setLayout(new GridLayout(1, 1, 5, 5));
+            bottomPanel.add(cancelBtn);
+    
+            frame.add(centerComponent, BorderLayout.CENTER);
+            frame.add(bottomPanel, BorderLayout.SOUTH);
+    
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    
+        frame.setVisible(true);
+    }
+
     public void orderEditingMenu(Integer currentOrderID, String currentEmployeeID) { //😊🥸✅💹✔️ efektīvā manierē pievieno pasutijumu logu
         JFrame frame = WindowFormat("rediģēt pasūtījumu id: " + currentOrderID, false);
 
