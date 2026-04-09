@@ -28,13 +28,11 @@ public class ElementFormatting {
         return panel;
     }
 
-    public static JPanel comboBoxGroup(String title, String[] options) {
+    public static JPanel comboBoxGroup(String title, JComboBox<String> comboBox) {
         JPanel panel = new JPanel(new BorderLayout(5, 5));
 
         JLabel label = new JLabel(title);
         label.setFont(new Font("Arial", Font.BOLD, 40));
-
-        JComboBox<String> comboBox = new JComboBox<>(options);
 
         panel.add(label, BorderLayout.WEST);
         panel.add(comboBox, BorderLayout.EAST);
@@ -59,6 +57,46 @@ public class ElementFormatting {
 
         return button;
     }
+
+    public static JButton listAddBtn() {
+        JButton addBtn = new JButton("Pievienot");
+
+        addBtn.setPreferredSize(new Dimension(0, 50));
+        addBtn.setMaximumSize(new Dimension(Integer.MAX_VALUE, 50));
+        addBtn.setBackground(new Color(66, 201, 87));
+        addBtn.setForeground(Color.WHITE);
+
+        return addBtn;
+    }
+
+    public static JButton listCancelBtn() {
+        JButton cancelBtn = new JButton("Cancel");
+
+        cancelBtn.setPreferredSize(new Dimension(0, 50));
+        cancelBtn.setMaximumSize(new Dimension(Integer.MAX_VALUE, 50));
+
+        return cancelBtn;
+    }
+
+    public static JButton listRemoveButton() {
+        JButton removeBtn = new JButton("Noņemt");
+
+        removeBtn.setPreferredSize(new Dimension(0, 50));
+        removeBtn.setMaximumSize(new Dimension(Integer.MAX_VALUE, 50));
+        removeBtn.setBackground(new Color(224, 86, 76));
+        removeBtn.setForeground(Color.WHITE);
+
+        return removeBtn;
+    }
+
+    public static JButton listEditBtn() {
+        JButton editBtn = new JButton("Rediģēt");
+        editBtn.setPreferredSize(new Dimension(0, 50));
+        editBtn.setMaximumSize(new Dimension(Integer.MAX_VALUE, 50));
+
+        return editBtn;
+    }
+
     public static JFrame WindowFormat(String title, Boolean exitOnClose) {
         JFrame frame = new JFrame(title);
         frame.pack();

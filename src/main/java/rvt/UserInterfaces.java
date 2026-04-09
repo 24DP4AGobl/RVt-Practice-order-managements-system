@@ -30,8 +30,8 @@ public class UserInterfaces extends ElementFormatting{
         JButton admin = buttonFormat("Administratori");
 
         darbinieki.addActionListener(e -> {
-            frame.dispose();
             currentEmployeeSelectionWindow();
+            frame.dispose();
         });
 
         admin.addActionListener(e -> {
@@ -139,7 +139,7 @@ public class UserInterfaces extends ElementFormatting{
 
     /* ===================== SELECT CURRENT EMPLOYEE ===================== */
     private void currentEmployeeSelectionWindow() {
-        JFrame frame = WindowFormat("Darbinieki", true);
+        JFrame frame = WindowFormat("Darbinieki", false);
 
         DefaultListModel<String> model = new DefaultListModel<>();
 
@@ -217,14 +217,12 @@ public class UserInterfaces extends ElementFormatting{
         title.setFont(new Font("Serif", Font.BOLD, 50));
         title.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        JButton addOrder = buttonFormat("Pievienot pasūtījumu");
-        addOrder.addActionListener(e -> employeeUI.windowAddOrder());
+        JButton manageOrders = buttonFormat("Pārvaldīt pasūtījumus");
+        manageOrders.addActionListener(e -> employeeUI.orderWindow(currentEmployeeID));
 
-        JButton viewOrders = buttonFormat("Apskatīt visus pasūtījumus");
-        JButton editOrders = buttonFormat("Rediģēt pasūtījumus");
         JButton products = buttonFormat("Apskatīt produktus");
         JButton UserReselection = buttonFormat("Mainīt lietotājus");
-        UserReselection.addActionListener(e -> {userSelect(); frame.dispose();});
+        UserReselection.addActionListener(e -> userSelect());
 
         JLabel warning = new JLabel("Brīdinājums");
         warning.setFont(new Font("Serif", Font.BOLD, 40));
@@ -236,11 +234,7 @@ public class UserInterfaces extends ElementFormatting{
 
         mainPanel.add(title);
         mainPanel.add(Box.createRigidArea(new Dimension(0, 50)));
-        mainPanel.add(addOrder);
-        mainPanel.add(Box.createRigidArea(new Dimension(0, 20)));
-        mainPanel.add(viewOrders);
-        mainPanel.add(Box.createRigidArea(new Dimension(0, 20)));
-        mainPanel.add(editOrders);
+        mainPanel.add(manageOrders);
         mainPanel.add(Box.createRigidArea(new Dimension(0, 20)));
         mainPanel.add(products);
         mainPanel.add(Box.createRigidArea(new Dimension(0, 20)));

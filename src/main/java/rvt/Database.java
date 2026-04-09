@@ -17,11 +17,14 @@ public class Database {
                 + "uzvards TEXT,"
                 + "amats TEXT)";
 
-        // String ordersTable = "CREATE TABLE IF NOT EXISTS orders ("
-        //        + "pasutijuma_id INTEGER PRIMARY KEY,"
-        //        + "datums DATETIME,"
-        //        + "summa DECIMAL(10,2),"
-        //        + "statuss VARCHAR(20))";
+        String ordersTable = "CREATE TABLE IF NOT EXISTS orders ("
+                + "pasutijuma_id INTEGER PRIMARY KEY,"
+                + "datums DATETIME,"
+                + "summa DECIMAL(10,2),"
+                + "statuss VARCHAR(20),"
+                + "darbinieks_id INTEGER,"
+                + "FOREIGN KEY(darbinieks_id) REFERENCES darbinieki(id)"
+                + ")";
 
         String delivererTable = "CREATE TABLE IF NOT EXISTS deliverer ("
                 + "piegadataja_id INTEGER PRIMARY KEY,"
@@ -33,9 +36,9 @@ public class Database {
              Statement stmt = conn.createStatement()) {
 
             stmt.execute(darbiniekiTable);
-        //    stmt.execute(ordersTable);
+            stmt.execute(ordersTable);
             stmt.execute(delivererTable);
-
+            //stmt.execute("DROP TABLE orders;");
         } catch (SQLException e) {
             e.printStackTrace();
         }
