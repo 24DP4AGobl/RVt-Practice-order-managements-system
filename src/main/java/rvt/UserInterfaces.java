@@ -70,16 +70,15 @@ public class UserInterfaces extends ElementFormatting{
         title.setFont(new Font("Serif", Font.BOLD, 50));
         title.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        JButton deleteProductInfo = buttonFormat("Dzēst produktu informāciju");
-        JButton addProductInfo = buttonFormat("Pievienot produktu informāciju");
-        JButton editProductInfo = buttonFormat("Rediģēt produktu informāciju");
-        JButton analyseData = buttonFormat("Analizēt datus par krājuma izlietojumu");
         JButton UserReselection = buttonFormat("Mainīt lietotājus");
         UserReselection.addActionListener(e -> {userSelect(); frame.dispose();});
 
         JLabel warning = new JLabel("Brīdinājums");
         warning.setFont(new Font("Serif", Font.BOLD, 40));
         warning.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        JButton productsBtn = buttonFormat("Produkti un krājumi");
+        productsBtn.addActionListener(e -> adminUI.productWindow()); // Atver produktu logu
 
         JButton addEmployee = buttonFormat("Pievienot darbinieku");
         addEmployee.addActionListener(e -> adminUI.addEmployeeWindow());
@@ -104,14 +103,8 @@ public class UserInterfaces extends ElementFormatting{
         warningContainer.setBackground(Color.RED);
 
         mainPanel.add(title);
-        mainPanel.add(Box.createRigidArea(new Dimension(0, 50)));
-        mainPanel.add(deleteProductInfo);
         mainPanel.add(Box.createRigidArea(new Dimension(0, 20)));
-        mainPanel.add(addProductInfo);
-        mainPanel.add(Box.createRigidArea(new Dimension(0, 20)));
-        mainPanel.add(editProductInfo);
-        mainPanel.add(Box.createRigidArea(new Dimension(0, 20)));
-        mainPanel.add(analyseData);
+        mainPanel.add(productsBtn);
         mainPanel.add(Box.createRigidArea(new Dimension(0, 20)));
         mainPanel.add(UserReselection);
         mainPanel.add(Box.createRigidArea(new Dimension(0, 20)));
