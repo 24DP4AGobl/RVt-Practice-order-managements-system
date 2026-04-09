@@ -120,9 +120,29 @@ public class EmployeeInterface extends ElementFormatting{
         inputGroup.add(comboBoxGroup("Statuss", statusComboBox));
         inputGroup.add(Box.createRigidArea(new Dimension(0, 20)));
 
+
+        JComboBox<String> productsComboBox = new JComboBox<>();
+        try (Connection conn = Database.connect();
+            Statement stmt = conn.createStatement();
+            ResultSet rs = stmt.executeQuery("SELECT * FROM products")) {
+
+            while (rs.next()) {
+                productsComboBox.addItem(rs.getString("nosaukums") + "| " + rs.getInt("produkts_id"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        inputGroup.add(comboBoxGroup("produkta_id", productsComboBox));
+        inputGroup.add(Box.createRigidArea(new Dimension(0, 20)));
+
+        JTextField gabField = new JTextField();
+        inputGroup.add(inputGroup("Gab", gabField));
+        inputGroup.add(Box.createRigidArea(new Dimension(0, 20)));
+
         JPanel bottomBtnGroup = new JPanel(new BorderLayout(5, 5));
         JButton confirm = confirmBtn("Confirm");
-        confirm.addActionListener(e -> {addOrderToDb(orderIDField, sumField, statusComboBox, currentEmployeeID); frame.dispose();});
+        confirm.addActionListener(e -> {addOrderToDb(orderIDField, sumField, statusComboBox, currentEmployeeID, productsComboBox, gabField); frame.dispose();});
 
         bottomBtnGroup.add(confirm, BorderLayout.WEST);
         bottomBtnGroup.add(cancelBtn("Cancel", frame), BorderLayout.EAST);
@@ -247,9 +267,9 @@ public class EmployeeInterface extends ElementFormatting{
         frame.setVisible(true);
     }
 
-    public void addOrderToDb(JTextField orderIDField, JTextField sumField, JComboBox<String> statusOptions, String currentEmployeeID) {
+    public void addOrderToDb(JTextField orderIDField, JTextField sumField, JComboBox<String> statusOptions, String currentEmployeeID, JComboBox<String> productOptions, JTextField gabField) {
         try (Connection dbConn = Database.connect()) {
-            String sql = "INSERT INTO orders(pasutijuma_id, datums, summa, statuss, darbinieks_id) VALUES(?,?,?,?,?)";
+            String sql = "INSERT INTO orders(pasutijuma_id, datums, summa, statuss, darbinieks_id, produkts_id, gab) VALUES(?,?,?,?,?,?,?)";
             LocalDateTime now = LocalDateTime.now();
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
@@ -262,6 +282,8 @@ public class EmployeeInterface extends ElementFormatting{
             pstmt.setString(3, sumField.getText());
             pstmt.setString(4, String.valueOf(statusOptions.getSelectedItem()));
             pstmt.setInt(5, Integer.valueOf(currentEmployeeID));
+            pstmt.setInt(6, Integer.valueOf(String.valueOf(statusOptions.getSelectedItem()).split("| ")[0]));
+            pstmt.setInt(7, Integer.parseInt(gabField.getText()));
             pstmt.executeUpdate();
 
             JOptionPane.showMessageDialog(null, "Saglabāts!");
