@@ -264,6 +264,24 @@ public class AdminInterface extends ElementFormatting{
 
     }
 
+    public boolean isLowStock() {
+        try (Connection conn = Database.connect();
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery("SELECT daudzums FROM products")) {
+    
+            while (rs.next()) {
+                if (rs.getInt("daudzums") < 20) {
+                    return true;
+                }
+            }
+    
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    
+        return false;
+    }
+
     public void productWindow() {
         JFrame frame = WindowFormat("Produkti un krājumi", true);
     
