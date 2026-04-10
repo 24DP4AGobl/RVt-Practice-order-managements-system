@@ -261,6 +261,19 @@ public class EmployeeInterface extends ElementFormatting{
         } catch (SQLException e) {
             e.printStackTrace();
         }
+        
+        //Loads items to the combobox//
+        try (Connection conn = Database.connect();
+            Statement stmt = conn.createStatement();
+
+            ResultSet rs = stmt.executeQuery("SELECT * FROM products WHERE produkts_id=?")) {
+
+            while (rs.next()) {
+                productsComboBox.addItem(rs.getInt("produkts_id") + " - " + rs.getString("nosaukums"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
 
         inputGroup.add(comboBoxGroup("produkta_id", productsComboBox));
         inputGroup.add(Box.createRigidArea(new Dimension(0, 20)));
@@ -269,16 +282,34 @@ public class EmployeeInterface extends ElementFormatting{
         inputGroup.add(inputGroup("Gab", gabField));
         inputGroup.add(Box.createRigidArea(new Dimension(0, 20)));
 
-        try (Connection conn2 = Database.connect()) {
-            String sql = "SELECT * FROM orders WHERE pasutijuma_id=?";
-            PreparedStatement pstmt = conn2.prepareStatement(sql);
-            pstmt.setInt(1, currentOrderID);
-            ResultSet rs2 = pstmt.executeQuery();
 
-            if (rs2.next()) {
-                sumField.setText(rs2.getString("summa"));
-                productsComboBox.setSelectedItem(rs2.getString("produkts_id"));
-                gabField.setText(rs2.getString("gab"));
+        //Changes the combobox selection//
+        try (Connection conn = Database.connect()) {
+            String sqlOrders = "SELECT * FROM orders WHERE pasutijuma_id=?";
+            PreparedStatement pstmtOrders = conn.prepareStatement(sqlOrders);
+            pstmtOrders.setInt(1, currentOrderID);
+
+            ResultSet rsOrders = pstmtOrders.executeQuery();
+
+            if (rsOrders.next()) {
+                sumField.setText(rsOrders.getString("summa"));
+                gabField.setText(rsOrders.getString("gab"));
+
+                int productID = rsOrders.getInt("produkts_id");
+
+                //Get products//
+                String sqlProducts = "SELECT * FROM products WHERE produkts_id=?";
+                PreparedStatement pstmtProducts = conn.prepareStatement(sqlProducts);
+                pstmtProducts.setInt(1, productID);
+
+                ResultSet rsProducts = pstmtProducts.executeQuery();
+                
+                if (rsProducts.next()) {
+                    String productSelection = rsProducts.getInt("produkts_id") + " - " +
+                                            rsProducts.getString("nosaukums");
+
+                    productsComboBox.setSelectedItem(productSelection);
+                }
             }
         } catch (SQLException ex) {
             ex.printStackTrace();

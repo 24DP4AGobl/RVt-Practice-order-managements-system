@@ -429,7 +429,18 @@ public class AdminInterface extends ElementFormatting{
             JTextField priceField = new JTextField();
             JTextField categoryField = new JTextField();
             JTextField amountField = new JTextField();
-            JTextField delivererField = new JTextField();
+
+            JComboBox<String> delivererComboBox = new JComboBox<>();
+            try (Connection conn = Database.connect();
+                Statement stmt = conn.createStatement();
+                ResultSet rs = stmt.executeQuery("SELECT * FROM deliverer")) {
+
+                while (rs.next()) {
+                    delivererComboBox.addItem(rs.getInt("piegadataja_id") + " - " + rs.getString("nosaukums"));
+                }
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
     
             inputGroup.add(inputGroup("Produkts ID", idField));
             inputGroup.add(Box.createRigidArea(new Dimension(0, 10)));
@@ -440,13 +451,15 @@ public class AdminInterface extends ElementFormatting{
             inputGroup.add(inputGroup("Cena", priceField));
             inputGroup.add(Box.createRigidArea(new Dimension(0, 10)));
     
-            inputGroup.add(inputGroup("Kategorija", categoryField));
+            String[] categoriesOptions = {"Ēdams", "Ēdam instrumenti", "Lego"};
+            JComboBox<String> categoriesComboBox = new JComboBox<>(categoriesOptions);
+            inputGroup.add(comboBoxGroup("Kategorija", categoriesComboBox));
             inputGroup.add(Box.createRigidArea(new Dimension(0, 10)));
     
             inputGroup.add(inputGroup("Daudzums", amountField));
             inputGroup.add(Box.createRigidArea(new Dimension(0, 10)));
     
-            inputGroup.add(inputGroup("Piegādātāja ID", delivererField));
+            inputGroup.add(comboBoxGroup("Piegādātāja ID", delivererComboBox));
     
             JPanel buttons = new JPanel(new BorderLayout(5, 5));
     
@@ -463,9 +476,9 @@ public class AdminInterface extends ElementFormatting{
                     ps.setInt(1, Integer.parseInt(idField.getText()));
                     ps.setString(2, nameField.getText());
                     ps.setBigDecimal(3, new java.math.BigDecimal(priceField.getText()));
-                    ps.setString(4, categoryField.getText());
+                    ps.setString(4, String.valueOf(categoriesComboBox.getSelectedItem()));
                     ps.setInt(5, Integer.parseInt(amountField.getText()));
-                    ps.setInt(6, Integer.parseInt(delivererField.getText()));
+                    ps.setInt(6, Integer.valueOf(String.valueOf(delivererComboBox.getSelectedItem()).split(" - ")[0]));
     
                     ps.executeUpdate();
     
@@ -548,8 +561,8 @@ public class AdminInterface extends ElementFormatting{
         if (where != null) sql += where;
     
         try (Connection conn = Database.connect();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-    
+            PreparedStatement stmt = conn.prepareStatement(sql)) {
+
             if (params != null) {
                 for (int i = 0; i < params.length; i++) {
                     stmt.setObject(i + 1, params[i]);
@@ -560,6 +573,7 @@ public class AdminInterface extends ElementFormatting{
     
             while (rs.next()) {
                 String deliverer = rs.getString("piegadatajs");
+                String deliverer_id = rs.getString("piegadatajs_id");
                 if (deliverer == null) deliverer = "Nav";
     
                 model.addElement(
@@ -568,7 +582,7 @@ public class AdminInterface extends ElementFormatting{
                         rs.getBigDecimal("cena") + " | " +
                         rs.getString("kategorija") + " | " +
                         rs.getInt("daudzums") + " gab | " +
-                        deliverer
+                        deliverer_id + " - " + deliverer
                 );
             }
     
@@ -634,23 +648,55 @@ public class AdminInterface extends ElementFormatting{
     private void editProduct(int id, JFrame frame) {
         JTextField nameField = new JTextField();
         JTextField priceField = new JTextField();
-        JTextField categoryField = new JTextField();
+
+        String[] categoriesOptions = {"Ēdams", "Ēdam instrumenti", "Lego"};
+        JComboBox<String> categoriesComboBox = new JComboBox<>(categoriesOptions);
+
         JTextField quantityField = new JTextField();
-        JTextField delivererIdField = new JTextField();
-    
-        try {
-            Connection conn = Database.connect();
+
+        JComboBox<String> delivererComboBox = new JComboBox<>();
+        
+        //Loads options into deliverer combobox//
+        try (Connection conn = Database.connect();
+            Statement stmt = conn.createStatement();
+            ResultSet rs = stmt.executeQuery("SELECT * FROM deliverer")) {
+
+            while (rs.next()) {
+                delivererComboBox.addItem(rs.getInt("piegadataja_id") + " - " + rs.getString("nosaukums"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        //Load existing data to fields//
+        try (Connection conn = Database.connect();) {
             String sql = "SELECT * FROM products WHERE produkts_id=?";
             PreparedStatement pstmt = conn.prepareStatement(sql);
             pstmt.setInt(1, id);
             ResultSet rs = pstmt.executeQuery();
-    
+            
+
             if (rs.next()) {
                 nameField.setText(rs.getString("nosaukums"));
                 priceField.setText(rs.getString("cena"));
-                categoryField.setText(rs.getString("kategorija"));
+                categoriesComboBox.setSelectedItem(rs.getString("kategorija"));
                 quantityField.setText(rs.getString("daudzums"));
-                delivererIdField.setText(rs.getString("piegadatajs_id"));
+
+                int delivererID = rs.getInt("piegadatajs_id");
+
+                //Get deliverer//
+                String sqlProducts = "SELECT * FROM deliverer WHERE piegadataja_id=?";
+                PreparedStatement pstmtProducts = conn.prepareStatement(sqlProducts);
+                pstmtProducts.setInt(1, delivererID);
+
+                ResultSet rsDeliverer = pstmtProducts.executeQuery();
+
+                if (rsDeliverer.next()) {
+                    String delivererSelection = rsDeliverer.getInt("piegadataja_id") + " - " +
+                                                rsDeliverer.getString("nosaukums");
+
+                    delivererComboBox.setSelectedItem(delivererSelection);
+                }
             }
     
             rs.close();
@@ -664,9 +710,9 @@ public class AdminInterface extends ElementFormatting{
         Object[] fields = {
                 "Nosaukums:", nameField,
                 "Cena:", priceField,
-                "Kategorija:", categoryField,
+                "Kategorija:", categoriesComboBox,
                 "Daudzums:", quantityField,
-                "Piegādātāja ID:", delivererIdField
+                "Piegādātāja ID:", delivererComboBox
         };
     
         int option = JOptionPane.showConfirmDialog(null, fields, "Rediģēt produktu", JOptionPane.OK_CANCEL_OPTION);
@@ -679,9 +725,9 @@ public class AdminInterface extends ElementFormatting{
     
                 pstmt.setString(1, nameField.getText());
                 pstmt.setBigDecimal(2, new java.math.BigDecimal(priceField.getText()));
-                pstmt.setString(3, categoryField.getText());
+                pstmt.setString(3, String.valueOf(categoriesComboBox.getSelectedItem()));
                 pstmt.setInt(4, Integer.parseInt(quantityField.getText()));
-                pstmt.setInt(5, Integer.parseInt(delivererIdField.getText()));
+                pstmt.setInt(5, Integer.valueOf(String.valueOf(delivererComboBox.getSelectedItem()).split(" - ")[0]));
                 pstmt.setInt(6, id);
     
                 pstmt.executeUpdate();
