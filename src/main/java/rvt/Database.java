@@ -26,7 +26,7 @@ public class Database {
                 + "produkts_id,"
                 + "gab,"
                 + "FOREIGN KEY(darbinieks_id) REFERENCES darbinieki(id),"
-                + "FOREIGN KEY(produkta_id) REFERENCES products(produkts_id)"
+                + "FOREIGN KEY(produkts_id) REFERENCES products(produkts_id)"
                 + ")";
 
         String delivererTable = "CREATE TABLE IF NOT EXISTS deliverer ("
@@ -51,6 +51,7 @@ public class Database {
             stmt.execute(ordersTable);
             stmt.execute(delivererTable);
             stmt.execute(productTable);
+            //stmt.execute("DROP TABLE orders");
         } catch (SQLException e) {
             e.printStackTrace();
         }

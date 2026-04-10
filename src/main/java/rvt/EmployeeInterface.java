@@ -23,16 +23,20 @@ public class EmployeeInterface extends ElementFormatting{
 
         try (Connection conn = Database.connect();
                 Statement stmt = conn.createStatement();
+                Statement stmt2 = conn.createStatement();
                 ResultSet rs = stmt.executeQuery("SELECT * FROM orders")) {
         
+                ResultSet rsDarbinieki = stmt2.executeQuery("SELECT * from darbinieki WHERE id=" + rs.getString("darbinieks_id"));
+
                 boolean empty = true;
                 while (rs.next()) {
                     empty = false;
                     String text = rs.getInt("pasutijuma_id") + " - " +
                             rs.getString("datums") + " | " +
-                            rs.getString("summa") + " | " +
+                            rs.getString("summa") + "€ " + " | " +
                             rs.getString("statuss") + " | " +
-                            rs.getString("darbinieks_id");
+                            "Uztaisīja: " + rs.getString("darbinieks_id") + " - " +
+                            rsDarbinieki.getString("vards");
                     model.addElement(text);
                 }
         
@@ -115,7 +119,7 @@ public class EmployeeInterface extends ElementFormatting{
         inputGroup.add(inputGroup("Summa", sumField));
         inputGroup.add(Box.createRigidArea(new Dimension(0, 20)));
 
-        String[] statusOptions = {"Izpildīts", "Procesā"};
+        String[] statusOptions = {"Procesā", "Izpildīts"};
         JComboBox<String> statusComboBox = new JComboBox<>(statusOptions);
         inputGroup.add(comboBoxGroup("Statuss", statusComboBox));
         inputGroup.add(Box.createRigidArea(new Dimension(0, 20)));
@@ -127,7 +131,7 @@ public class EmployeeInterface extends ElementFormatting{
             ResultSet rs = stmt.executeQuery("SELECT * FROM products")) {
 
             while (rs.next()) {
-                productsComboBox.addItem(rs.getString("nosaukums") + "| " + rs.getInt("produkts_id"));
+                productsComboBox.addItem(rs.getInt("produkts_id") + " - " + rs.getString("nosaukums"));
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -246,9 +250,43 @@ public class EmployeeInterface extends ElementFormatting{
         inputGroup.add(comboBoxGroup("Statuss", statusComboBox));
         inputGroup.add(Box.createRigidArea(new Dimension(0, 20)));
 
+        JComboBox<String> productsComboBox = new JComboBox<>();
+        try (Connection conn = Database.connect();
+            Statement stmt = conn.createStatement();
+            ResultSet rs = stmt.executeQuery("SELECT * FROM products")) {
+
+            while (rs.next()) {
+                productsComboBox.addItem(rs.getInt("produkts_id") + " - " + rs.getString("nosaukums"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        inputGroup.add(comboBoxGroup("produkta_id", productsComboBox));
+        inputGroup.add(Box.createRigidArea(new Dimension(0, 20)));
+
+        JTextField gabField = new JTextField();
+        inputGroup.add(inputGroup("Gab", gabField));
+        inputGroup.add(Box.createRigidArea(new Dimension(0, 20)));
+
+        try (Connection conn2 = Database.connect()) {
+            String sql = "SELECT * FROM orders WHERE pasutijuma_id=?";
+            PreparedStatement pstmt = conn2.prepareStatement(sql);
+            pstmt.setInt(1, currentOrderID);
+            ResultSet rs2 = pstmt.executeQuery();
+
+            if (rs2.next()) {
+                sumField.setText(rs2.getString("summa"));
+                productsComboBox.setSelectedItem(rs2.getString("produkts_id"));
+                gabField.setText(rs2.getString("gab"));
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+
         JPanel bottomBtnGroup = new JPanel(new BorderLayout(5, 5));
         JButton confirm = confirmBtn("Confirm");
-        confirm.addActionListener(e -> {updateOrderToDb(currentOrderID, sumField, statusComboBox, currentEmployeeID); frame.dispose();});
+        confirm.addActionListener(e -> {updateOrderToDb(currentOrderID, sumField, statusComboBox, currentEmployeeID, productsComboBox, gabField); frame.dispose();});
 
         bottomBtnGroup.add(confirm, BorderLayout.WEST);
         bottomBtnGroup.add(cancelBtn("Cancel", frame), BorderLayout.EAST);
@@ -282,7 +320,7 @@ public class EmployeeInterface extends ElementFormatting{
             pstmt.setString(3, sumField.getText());
             pstmt.setString(4, String.valueOf(statusOptions.getSelectedItem()));
             pstmt.setInt(5, Integer.valueOf(currentEmployeeID));
-            pstmt.setInt(6, Integer.valueOf(String.valueOf(statusOptions.getSelectedItem()).split("| ")[0]));
+            pstmt.setInt(6, Integer.valueOf(String.valueOf(productOptions.getSelectedItem()).split(" - ")[0]));
             pstmt.setInt(7, Integer.parseInt(gabField.getText()));
             pstmt.executeUpdate();
 
@@ -294,9 +332,9 @@ public class EmployeeInterface extends ElementFormatting{
         }
     }
 
-    public void updateOrderToDb(Integer currentOrderID, JTextField sumField, JComboBox<String> statusOptions, String currentEmployeeID) {
+    public void updateOrderToDb(Integer currentOrderID, JTextField sumField, JComboBox<String> statusOptions, String currentEmployeeID, JComboBox productOptions, JTextField gabField) {
         try (Connection conn3 = Database.connect()) {
-            String sql = "UPDATE orders SET summa=?, statuss=? WHERE pasutijuma_id=?";
+            String sql = "UPDATE orders SET summa=?, statuss=?, produkts_id=?, gab=? WHERE pasutijuma_id=?";
             PreparedStatement pstmt = conn3.prepareStatement(sql);
 
             try {
@@ -308,7 +346,9 @@ public class EmployeeInterface extends ElementFormatting{
             }
 
             pstmt.setString(2, String.valueOf(statusOptions.getSelectedItem()));
-            pstmt.setInt(3, currentOrderID);
+            pstmt.setInt(3, Integer.valueOf(String.valueOf(productOptions.getSelectedItem()).split(" - ")[0]));
+            pstmt.setInt(4, Integer.parseInt(gabField.getText()));
+            pstmt.setInt(5, currentOrderID);
 
             pstmt.executeUpdate();
 
