@@ -285,157 +285,299 @@ public class AdminInterface extends ElementFormatting{
     public void productWindow() {
         JFrame frame = WindowFormat("Produkti un krājumi", true);
     
+        JList<String> list = new JList<>();
+        list.setFont(new Font("Arial", Font.PLAIN, 25));
+    
+        frame.setLayout(new BorderLayout());
+        frame.add(new JScrollPane(list), BorderLayout.CENTER);
+    
+        // ===================== FILTER STATE =====================
+        StringBuilder where = new StringBuilder();
+        java.util.List<Object> params = new java.util.ArrayList<>();
+    
+        Runnable refresh = () -> {
+            String sqlWhere = where.length() == 0 ? null : "WHERE " + where.toString();
+            list.setModel(loadProducts(sqlWhere, params.toArray()));
+        };
+    
+        refresh.run();
+    
+        // ===================== FILTER BUTTONS =====================
+        JButton filterPrice = buttonFormat("Cena");
+        JButton filterAmount = buttonFormat("Daudzums");
+        JButton filterDeliverer = buttonFormat("Piegādātājs");
+        JButton resetBtn = buttonFormat("Reset");
+    
+        Dimension smallFilterSize = new Dimension(0, 40);
+    
+        filterPrice.setPreferredSize(smallFilterSize);
+        filterAmount.setPreferredSize(smallFilterSize);
+        filterDeliverer.setPreferredSize(smallFilterSize);
+        resetBtn.setPreferredSize(smallFilterSize);
+    
+        filterPrice.setMaximumSize(smallFilterSize);
+        filterAmount.setMaximumSize(smallFilterSize);
+        filterDeliverer.setMaximumSize(smallFilterSize);
+        resetBtn.setMaximumSize(smallFilterSize);
+    
+        // ===================== FILTERS =====================
+        filterPrice.addActionListener(e -> {
+            JTextField min = new JTextField();
+            JTextField max = new JTextField();
+    
+            Object[] fields = {"Min cena:", min, "Max cena:", max};
+    
+            int option = JOptionPane.showConfirmDialog(null, fields, "Cena", JOptionPane.OK_CANCEL_OPTION);
+    
+            if (option == JOptionPane.OK_OPTION) {
+                try {
+                    if (where.length() > 0) where.append(" AND ");
+                    where.append("p.cena BETWEEN ? AND ?");
+                    params.add(Double.parseDouble(min.getText()));
+                    params.add(Double.parseDouble(max.getText()));
+                    refresh.run();
+                } catch (Exception ex) {
+                    JOptionPane.showMessageDialog(null, "Nepareizi dati!");
+                }
+            }
+        });
+    
+        filterAmount.addActionListener(e -> {
+            JTextField min = new JTextField();
+            JTextField max = new JTextField();
+    
+            Object[] fields = {"Min daudzums:", min, "Max daudzums:", max};
+    
+            int option = JOptionPane.showConfirmDialog(null, fields, "Daudzums", JOptionPane.OK_CANCEL_OPTION);
+    
+            if (option == JOptionPane.OK_OPTION) {
+                try {
+                    if (where.length() > 0) where.append(" AND ");
+                    where.append("p.daudzums BETWEEN ? AND ?");
+                    params.add(Integer.parseInt(min.getText()));
+                    params.add(Integer.parseInt(max.getText()));
+                    refresh.run();
+                } catch (Exception ex) {
+                    JOptionPane.showMessageDialog(null, "Nepareizi dati!");
+                }
+            }
+        });
+    
+        filterDeliverer.addActionListener(e -> {
+            String input = JOptionPane.showInputDialog("Piegādātāja ID:");
+    
+            if (input != null && !input.isEmpty()) {
+                try {
+                    if (where.length() > 0) where.append(" AND ");
+                    where.append("p.piegadatajs_id = ?");
+                    params.add(Integer.parseInt(input));
+                    refresh.run();
+                } catch (Exception ex) {
+                    JOptionPane.showMessageDialog(null, "Nepareizs ID!");
+                }
+            }
+        });
+    
+        resetBtn.addActionListener(e -> {
+            where.setLength(0);
+            params.clear();
+            list.clearSelection();
+            refresh.run();
+        });
+    
+        // ===================== FILTER UI =====================
+        JLabel filterTitle = new JLabel("Filtrēšana");
+        filterTitle.setFont(new Font("Arial", Font.BOLD, 18));
+        filterTitle.setHorizontalAlignment(SwingConstants.CENTER);
+    
+        JPanel topPanel = new JPanel(new BorderLayout());
+    
+        JPanel filterButtons = new JPanel(new GridLayout(1, 4, 5, 5));
+        filterButtons.add(filterPrice);
+        filterButtons.add(filterAmount);
+        filterButtons.add(filterDeliverer);
+        filterButtons.add(resetBtn);
+    
+        topPanel.add(filterTitle, BorderLayout.NORTH);
+        topPanel.add(filterButtons, BorderLayout.CENTER);
+    
+        frame.add(topPanel, BorderLayout.NORTH);
+    
+        // ===================== BOTTOM BUTTONS =====================
+        JButton addBtn = buttonFormat("Pievienot");
+        JButton editBtn = buttonFormat("Rediģēt");
+        JButton removeBtn = buttonFormat("Dzēst");
+        JButton cancelBtn = buttonFormat("Atcelt");
+    
+        // ===================== ADD PRODUCT (FIXED PROPER UI) =====================
+        addBtn.addActionListener(e -> {
+    
+            JFrame addFrame = WindowFormat("Pievienot produktu", false);
+    
+            JPanel mainPanel = new JPanel();
+            mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
+    
+            JLabel title = new JLabel("Pievienojiet jaunu produktu");
+            title.setFont(new Font("Arial", Font.BOLD, 40));
+            title.setAlignmentX(Component.CENTER_ALIGNMENT);
+    
+            JPanel inputGroup = new JPanel();
+            inputGroup.setLayout(new BoxLayout(inputGroup, BoxLayout.Y_AXIS));
+    
+            JTextField idField = new JTextField();
+            JTextField nameField = new JTextField();
+            JTextField priceField = new JTextField();
+            JTextField categoryField = new JTextField();
+            JTextField amountField = new JTextField();
+            JTextField delivererField = new JTextField();
+    
+            inputGroup.add(inputGroup("Produkts ID", idField));
+            inputGroup.add(Box.createRigidArea(new Dimension(0, 10)));
+    
+            inputGroup.add(inputGroup("Nosaukums", nameField));
+            inputGroup.add(Box.createRigidArea(new Dimension(0, 10)));
+    
+            inputGroup.add(inputGroup("Cena", priceField));
+            inputGroup.add(Box.createRigidArea(new Dimension(0, 10)));
+    
+            inputGroup.add(inputGroup("Kategorija", categoryField));
+            inputGroup.add(Box.createRigidArea(new Dimension(0, 10)));
+    
+            inputGroup.add(inputGroup("Daudzums", amountField));
+            inputGroup.add(Box.createRigidArea(new Dimension(0, 10)));
+    
+            inputGroup.add(inputGroup("Piegādātāja ID", delivererField));
+    
+            JPanel buttons = new JPanel(new BorderLayout(5, 5));
+    
+            JButton confirm = confirmBtn("Saglabāt");
+            JButton cancel = cancelBtn("Atcelt", addFrame);
+    
+            confirm.addActionListener(ev -> {
+                try (Connection conn = Database.connect()) {
+    
+                    String sql = "INSERT INTO products(produkts_id, nosaukums, cena, kategorija, daudzums, piegadatajs_id) VALUES(?,?,?,?,?,?)";
+    
+                    PreparedStatement ps = conn.prepareStatement(sql);
+    
+                    ps.setInt(1, Integer.parseInt(idField.getText()));
+                    ps.setString(2, nameField.getText());
+                    ps.setBigDecimal(3, new java.math.BigDecimal(priceField.getText()));
+                    ps.setString(4, categoryField.getText());
+                    ps.setInt(5, Integer.parseInt(amountField.getText()));
+                    ps.setInt(6, Integer.parseInt(delivererField.getText()));
+    
+                    ps.executeUpdate();
+    
+                    addFrame.dispose();
+                    refresh.run();
+    
+                } catch (Exception ex) {
+                    JOptionPane.showMessageDialog(null, "Kļūda: " + ex.getMessage());
+                }
+            });
+    
+            buttons.add(confirm, BorderLayout.WEST);
+            buttons.add(cancel, BorderLayout.EAST);
+    
+            mainPanel.add(title);
+            mainPanel.add(Box.createRigidArea(new Dimension(0, 20)));
+            mainPanel.add(inputGroup);
+            mainPanel.add(Box.createRigidArea(new Dimension(0, 20)));
+            mainPanel.add(buttons);
+    
+            JPanel wrapper = new JPanel(new GridBagLayout());
+            wrapper.add(mainPanel);
+    
+            addFrame.add(wrapper);
+            addFrame.setVisible(true);
+        });
+    
+        // ===================== EDIT =====================
+        editBtn.addActionListener(e -> {
+            if (list.isSelectionEmpty()) {
+                JOptionPane.showMessageDialog(null, "Nav izvēlēts produkts!");
+                return;
+            }
+    
+            int id = Integer.parseInt(list.getSelectedValue().split(" - ")[0]);
+            editProduct(id, frame);
+        });
+    
+        // ===================== DELETE =====================
+        removeBtn.addActionListener(e -> {
+            if (list.isSelectionEmpty()) {
+                JOptionPane.showMessageDialog(null, "Nav izvēlēts produkts!");
+                return;
+            }
+    
+            int id = Integer.parseInt(list.getSelectedValue().split(" - ")[0]);
+    
+            try (Connection conn = Database.connect()) {
+                PreparedStatement ps = conn.prepareStatement(
+                        "DELETE FROM products WHERE produkts_id=?"
+                );
+                ps.setInt(1, id);
+                ps.executeUpdate();
+    
+                refresh.run();
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(null, "Kļūda dzēšanā!");
+            }
+        });
+    
+        cancelBtn.addActionListener(e -> frame.dispose());
+    
+        JPanel bottomPanel = new JPanel(new GridLayout(1, 4, 5, 5));
+        bottomPanel.add(addBtn);
+        bottomPanel.add(editBtn);
+        bottomPanel.add(removeBtn);
+        bottomPanel.add(cancelBtn);
+    
+        frame.add(bottomPanel, BorderLayout.SOUTH);
+    
+        frame.setVisible(true);
+    }
+    private DefaultListModel<String> loadProducts(String where, Object[] params) {
         DefaultListModel<String> model = new DefaultListModel<>();
-        JList<String> list = null;
+    
+        String sql = "SELECT p.*, d.nosaukums AS piegadatajs " +
+                "FROM products p LEFT JOIN deliverer d " +
+                "ON p.piegadatajs_id = d.piegadataja_id ";
+    
+        if (where != null) sql += where;
     
         try (Connection conn = Database.connect();
-             Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery(
-                     "SELECT p.*, d.nosaukums AS piegadatajs " +
-                     "FROM products p LEFT JOIN deliverer d " +
-                     "ON p.piegadatajs_id = d.piegadataja_id")) {
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
     
-            boolean empty = true;
+            if (params != null) {
+                for (int i = 0; i < params.length; i++) {
+                    stmt.setObject(i + 1, params[i]);
+                }
+            }
+    
+            ResultSet rs = stmt.executeQuery();
     
             while (rs.next()) {
-                empty = false;
-    
                 String deliverer = rs.getString("piegadatajs");
                 if (deliverer == null) deliverer = "Nav";
     
-                String text = rs.getInt("produkts_id") + " - " +
+                model.addElement(
+                        rs.getInt("produkts_id") + " - " +
                         rs.getString("nosaukums") + " | " +
                         rs.getBigDecimal("cena") + " | " +
                         rs.getString("kategorija") + " | " +
                         rs.getInt("daudzums") + " gab | " +
-                        deliverer;
-    
-                model.addElement(text);
+                        deliverer
+                );
             }
-    
-            frame.setLayout(new BorderLayout());
-    
-            JComponent centerComponent;
-    
-            if (empty) {
-                JLabel label = new JLabel("Produktu nav :(");
-                label.setFont(new Font("Serif", Font.BOLD, 25));
-                label.setHorizontalAlignment(SwingConstants.CENTER);
-                centerComponent = label;
-            } else {
-                list = new JList<>(model);
-                list.setFont(new Font("Arial", Font.PLAIN, 25));
-                centerComponent = new JScrollPane(list);
-            }
-    
-            JButton addBtn = buttonFormat("Pievienot");
-            JButton editBtn = buttonFormat("Rediģēt");
-            JButton removeBtn = buttonFormat("Dzēst");
-            JButton cancelBtn = buttonFormat("Atcelt");
-    
-            JList<String> finalList = list;
-    
-            // ADD
-            addBtn.addActionListener(e -> {
-                JTextField idField = new JTextField();
-                JTextField nameField = new JTextField();
-                JTextField priceField = new JTextField();
-                JTextField categoryField = new JTextField();
-                JTextField quantityField = new JTextField();
-                JTextField delivererIdField = new JTextField();
-    
-                Object[] fields = {
-                        "Produkts ID:", idField,
-                        "Nosaukums:", nameField,
-                        "Cena:", priceField,
-                        "Kategorija:", categoryField,
-                        "Daudzums:", quantityField,
-                        "Piegādātāja ID:", delivererIdField
-                };
-    
-                int option = JOptionPane.showConfirmDialog(null, fields, "Pievienot produktu", JOptionPane.OK_CANCEL_OPTION);
-    
-                if (option == JOptionPane.OK_OPTION) {
-                    try (Connection dbConn = Database.connect()) {
-                        String sql = "INSERT INTO products(produkts_id, nosaukums, cena, kategorija, daudzums, piegadatajs_id) VALUES(?,?,?,?,?,?)";
-                        PreparedStatement pstmt = dbConn.prepareStatement(sql);
-    
-                        pstmt.setInt(1, Integer.parseInt(idField.getText()));
-                        pstmt.setString(2, nameField.getText());
-                        pstmt.setBigDecimal(3, new java.math.BigDecimal(priceField.getText()));
-                        pstmt.setString(4, categoryField.getText());
-                        pstmt.setInt(5, Integer.parseInt(quantityField.getText()));
-                        pstmt.setInt(6, Integer.parseInt(delivererIdField.getText()));
-    
-                        pstmt.executeUpdate();
-    
-                        JOptionPane.showMessageDialog(null, "Saglabāts!");
-                        frame.dispose();
-                        productWindow();
-                    } catch (Exception ex) {
-                        JOptionPane.showMessageDialog(null, "Kļūda! Pārbaudi datus.");
-                    }
-                }
-            });
-    
-            // EDIT
-            editBtn.addActionListener(e -> {
-                if (finalList == null || finalList.isSelectionEmpty()) {
-                    JOptionPane.showMessageDialog(null, "Nav izvēlēts produkts!");
-                    return;
-                }
-            
-                int id = Integer.parseInt(finalList.getSelectedValue().split(" - ")[0]);
-                editProduct(id, frame);
-            });
-    
-            // REMOVE
-            removeBtn.addActionListener(e -> {
-                if (finalList == null || finalList.isSelectionEmpty()) {
-                    JOptionPane.showMessageDialog(null, "Nav izvēlēts produkts!");
-                    return;
-                }
-    
-                String selected = finalList.getSelectedValue();
-                int id = Integer.parseInt(selected.split(" - ")[0]);
-    
-                try (Connection dbConn = Database.connect()) {
-                    String sql = "DELETE FROM products WHERE produkts_id=?";
-                    PreparedStatement pstmt = dbConn.prepareStatement(sql);
-                    pstmt.setInt(1, id);
-                    pstmt.executeUpdate();
-    
-                    JOptionPane.showMessageDialog(null, "Dzēsts!");
-                    frame.dispose();
-                    productWindow();
-                } catch (Exception ex) {
-                    JOptionPane.showMessageDialog(null, "Kļūda dzēšanā!");
-                }
-            });
-    
-            cancelBtn.addActionListener(e -> frame.dispose());
-    
-            if (empty) {
-                editBtn.setEnabled(false);
-                removeBtn.setEnabled(false);
-            }
-    
-            JPanel bottomPanel = new JPanel(new GridLayout(1, 4, 5, 5));
-            bottomPanel.add(addBtn);
-            bottomPanel.add(editBtn);
-            bottomPanel.add(removeBtn);
-            bottomPanel.add(cancelBtn);
-    
-            frame.add(centerComponent, BorderLayout.CENTER);
-            frame.add(bottomPanel, BorderLayout.SOUTH);
     
         } catch (Exception e) {
             e.printStackTrace();
         }
     
-        frame.setVisible(true);
+        return model;
     }
-
     
     public void addDelivererToDb(JTextField delivererField, JTextField nameField, JTextField numField, JTextField gmailField) {
         try (Connection dbConn = Database.connect()) {
