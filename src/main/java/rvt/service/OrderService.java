@@ -15,6 +15,10 @@ public class OrderService {
         return orderDAO.getAllOrders();
     }
 
+    public List<Order> getOrders(Integer statusId, Integer employeeId) throws SQLException {
+        return orderDAO.getOrders(statusId, employeeId);
+    }
+
     public void addOrder(Order order) throws SQLException {
             if (order.getDate() == null || order.getDate().isEmpty()) {
                 throw new IllegalArgumentException("Datums ir obligāts");
@@ -33,6 +37,10 @@ public class OrderService {
             }
 
         orderDAO.addOrder(order);
+    }
+
+    public Order getOrderById(int id) throws SQLException {
+        return orderDAO.getOrderById(id);
     }
 
     public void updateOrder(Order order) throws SQLException {

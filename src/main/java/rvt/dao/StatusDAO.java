@@ -17,7 +17,7 @@ public class StatusDAO {
             ResultSet rs = stmt.executeQuery("SELECT * FROM statuss")) {
 
             while (rs.next()) {
-                Status status = new Status(rs.getInt("statuss_id"),
+                Status status = new Status(rs.getInt("statusa_id"),
                                         rs.getString("nosaukums")
                                         );
                 statuses.add(status);
@@ -29,7 +29,7 @@ public class StatusDAO {
 
     public void addStatus(Status status) throws SQLException {
         try (Connection dbConn = Database.connect()) {
-            String sql = "INSERT INTO statuss(statuss_id, nosaukums) VALUES(?,?)";
+            String sql = "INSERT INTO statuss(statusa_id, nosaukums) VALUES(?,?)";
 
             PreparedStatement pstmt = dbConn.prepareStatement(sql);
 

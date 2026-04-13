@@ -26,20 +26,17 @@ public class AdminPanel extends JPanel {
         sideBar.setBorder(BorderFactory.createEmptyBorder(20, 10, 10, 10));
 
 
-        JLabel Rediģēt = text.text3("Rediģēt");
-        Rediģēt.setForeground(Color.white);
+        JLabel Misc = text.text3("Misc");
+        Misc.setForeground(Color.white);
 
         JButton dashboardBtn = btn.sideBarBtn("Galvenā");
         JButton productsBtn = btn.sideBarBtn("Produkti");
         JButton employeesBtn = btn.sideBarBtn("Darbinieki");
+        JButton delivererBtn = btn.sideBarBtn("Piegādātāji");
+        JButton ordersBtn = btn.sideBarBtn("Pasūtījumi");
         JButton catBtn = btn.sideBarBtn("Kategorijas");
         JButton statusBtn = btn.sideBarBtn("Statusi");
 
-
-        JLabel Apskatīt = text.text3("Apskatīt");
-        Apskatīt.setForeground(Color.white);
-
-        JButton ordersBtn = btn.sideBarBtn("Pasūtījumi");
 
         sideBar.add(dashboardBtn);
         sideBar.add(Box.createRigidArea(new Dimension(0, 20)));
@@ -47,13 +44,17 @@ public class AdminPanel extends JPanel {
         sideBar.add(Box.createRigidArea(new Dimension(0, 10)));
         sideBar.add(employeesBtn);
         sideBar.add(Box.createRigidArea(new Dimension(0, 10)));
+        sideBar.add(ordersBtn);
+        sideBar.add(Box.createRigidArea(new Dimension(0, 10)));
+        sideBar.add(delivererBtn);
+        sideBar.add(Box.createRigidArea(new Dimension(0, 30)));
+
+        sideBar.add(Misc);
+        sideBar.add(Box.createRigidArea(new Dimension(0, 5)));
         sideBar.add(catBtn);
         sideBar.add(Box.createRigidArea(new Dimension(0, 10)));
         sideBar.add(statusBtn);
         sideBar.add(Box.createRigidArea(new Dimension(0, 30)));
-        sideBar.add(Apskatīt);
-        sideBar.add(Box.createRigidArea(new Dimension(0, 5)));
-        sideBar.add(ordersBtn);
 
         // 🔹 Content
         //JPanel content = new JPanel(new BorderLayout());
@@ -62,18 +63,26 @@ public class AdminPanel extends JPanel {
         JPanel content = new JPanel(cardLayout);
         JScrollPane scroll = new JScrollPane();
 
+        content.add(new DashboardPanel(),  "dashboard");
+        dashboardBtn.addActionListener(e -> cardLayout.show(content, "dashboard"));
+
         content.add(new ProductPanel(),  "products");
         productsBtn.addActionListener(e -> cardLayout.show(content, "products"));
+
         content.add(new EmployeePanel(), "employees");
         employeesBtn.addActionListener(e -> cardLayout.show(content, "employees"));
-        content.add(new CategoryPanel(), "categories");
-        catBtn.addActionListener(e -> cardLayout.show(content, "categories"));
-        //content.add(new StatusPanel(), "statuses");
-        //employeesBtn.addActionListener(e -> cardLayout.show(content, "statuses"));
-        //content.add(new DelivererPanel(), "deliverers");
-        employeesBtn.addActionListener(e -> cardLayout.show(content, "deliverers"));
+
+        content.add(new DelivererPanel(), "deliverers");
+        delivererBtn.addActionListener(e -> cardLayout.show(content, "deliverers"));
+
         content.add(new OrderPanel(), "orders");
         ordersBtn.addActionListener(e -> cardLayout.show(content, "orders"));
+
+        content.add(new CategoryPanel(), "categories");
+        catBtn.addActionListener(e -> cardLayout.show(content, "categories"));
+
+        content.add(new StatusPanel(), "statuses");
+        statusBtn.addActionListener(e -> cardLayout.show(content, "statuses"));
 
         scroll.add(content);
 

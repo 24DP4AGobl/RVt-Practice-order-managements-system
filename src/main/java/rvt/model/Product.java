@@ -69,4 +69,9 @@ public class Product {
     public int getDelId() {
         return delivererId;
     }
+
+    @Override
+    public String toString() {
+        return name;
+    }
 }

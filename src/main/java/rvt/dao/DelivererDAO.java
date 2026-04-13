@@ -14,7 +14,7 @@ public class DelivererDAO {
         try (Connection conn = Database.connect();
             Statement stmt = conn.createStatement();
             Statement stmt2 = conn.createStatement();
-            ResultSet rs = stmt.executeQuery("SELECT * FROM pasutijumi")) {
+            ResultSet rs = stmt.executeQuery("SELECT * FROM piegadataji")) {
 
             while (rs.next()) {
                 Deliverer deliverer = new Deliverer(rs.getInt("piegadataja_id"),

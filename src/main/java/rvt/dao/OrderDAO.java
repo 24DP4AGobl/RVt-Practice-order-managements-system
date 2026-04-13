@@ -1,5 +1,6 @@
 package rvt.dao;
 
+import rvt.model.Employee;
 import  rvt.model.Order;
 
 import java.math.BigDecimal;
@@ -53,7 +54,7 @@ public class OrderDAO {
 
     public void updateOrder(Order order) throws SQLException {
         try (Connection conn3 = Database.connect()) {
-            String sql = "UPDATE pasutijumi SET summa=?, statuss=?, produkts_id=?, gab=? WHERE pasutijuma_id=?";
+            String sql = "UPDATE pasutijumi SET summa=?, status_id=?, produkts_id=?, gab=? WHERE pasutijuma_id=?";
             PreparedStatement pstmt = conn3.prepareStatement(sql);
 
             String input = String.valueOf(order.getTotal()).trim().replace(",", ".");
@@ -78,4 +79,76 @@ public class OrderDAO {
             pstmt.executeUpdate();
         }
     }
+
+    public List<Order> getOrders(Integer statusId, Integer employeeId) throws SQLException {
+
+        List<Order> orders = new ArrayList<>();
+
+        StringBuilder sql = new StringBuilder("SELECT * FROM pasutijumi WHERE 1=1");
+
+        if (statusId != null) {
+            sql.append(" AND status_id = ?");
+        }
+
+        if (employeeId != null) {
+            sql.append(" AND darbinieks_id = ?");
+        }
+
+        try (Connection conn = Database.connect();
+            PreparedStatement pstmt = conn.prepareStatement(sql.toString())) {
+
+            int index = 1;
+
+            if (statusId != null) {
+                pstmt.setInt(index++, statusId);
+            }
+
+            if (employeeId != null) {
+                pstmt.setInt(index++, employeeId);
+            }
+
+            ResultSet rs = pstmt.executeQuery();
+
+            while (rs.next()) {
+                Order order = new Order(
+                    rs.getInt("pasutijuma_id"),
+                    rs.getString("datums"),
+                    rs.getBigDecimal("summa"),
+                    rs.getInt("gab"),
+                    rs.getInt("status_id"),
+                    rs.getInt("darbinieks_id"),
+                    rs.getInt("produkts_id")
+                );
+
+                orders.add(order);
+            }
+        }
+
+        return orders;
+    }
+
+    public Order getOrderById(Integer id) throws SQLException {
+        String sql = "SELECT * FROM pasutijumi WHERE pasutijuma_id = ?";
+
+        try (Connection conn = Database.connect();
+            PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setInt(1, id);
+
+            ResultSet rs = pstmt.executeQuery();
+
+            if (rs.next()) {
+                return new Order(
+                    rs.getInt("pasutijuma_id"),
+                    rs.getString("datums"),
+                    rs.getBigDecimal("summa"),
+                    rs.getInt("gab"),
+                    rs.getInt("status_id"),
+                    rs.getInt("darbinieks_id"),
+                    rs.getInt("produkts_id"));
+            }
+        }
+
+        return null; // not found
+        }
 }

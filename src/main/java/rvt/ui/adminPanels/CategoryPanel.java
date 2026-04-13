@@ -1,21 +1,16 @@
 package rvt.ui.adminPanels;
 
-import java.awt.CardLayout;
 import java.util.List;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
-import javax.swing.JButton;
+import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+import java.awt.*;
 
 import rvt.model.Category;
 import rvt.service.CategoryService;
+import rvt.ui.DatabaseFunctionality.Category.*;
 import rvt.util.ErrorHandler;
 import rvt.util.ButtonFormatting;
 import rvt.util.UIColors;
-import rvt.ui.adminPanels.adminMenu.Category.*;
 
 public class CategoryPanel extends JPanel {
         
