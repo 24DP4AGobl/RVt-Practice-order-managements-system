@@ -1,4 +1,4 @@
-package rvt;
+package rvt.oldVersion;
 
 import javax.swing.*;
 import java.awt.*;
@@ -363,7 +363,7 @@ public class EmployeeInterface extends ElementFormatting{
         }
     }
 
-    public void updateOrderToDb(Integer currentOrderID, JTextField sumField, JComboBox<String> statusOptions, String currentEmployeeID, JComboBox productOptions, JTextField gabField) {
+    public void updateOrderToDb(Integer currentOrderID, JTextField sumField, JComboBox<String> statusOptions, String currentEmployeeID, JComboBox<String> productOptions, JTextField gabField) {
         try (Connection conn3 = Database.connect()) {
             String sql = "UPDATE orders SET summa=?, statuss=?, produkts_id=?, gab=? WHERE pasutijuma_id=?";
             PreparedStatement pstmt = conn3.prepareStatement(sql);
