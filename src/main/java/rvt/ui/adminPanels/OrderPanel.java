@@ -7,19 +7,26 @@ import java.awt.*;
 
 import rvt.model.Order;
 import rvt.service.OrderService;
+import rvt.service.StatusService;
+import rvt.model.Status;
 import rvt.ui.DatabaseFunctionality.Order.OrderAdd;
 import rvt.ui.DatabaseFunctionality.Order.OrderEdit;
 
 import rvt.util.ButtonFormatting;
 import rvt.util.ErrorHandler;
 import rvt.util.UIColors;
+import rvt.util.TextFormatting;
 
 public class OrderPanel extends JPanel {
     
     private JTable table;
+
     private OrderService service = new OrderService();
+    StatusService statService = new StatusService();
+
     ButtonFormatting btn = new ButtonFormatting();
     UIColors color = new UIColors();
+    TextFormatting text = new TextFormatting();
 
     public OrderPanel() {
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
@@ -27,6 +34,8 @@ public class OrderPanel extends JPanel {
         table = new JTable(new DefaultTableModel(
             new Object[]{"ID", "Datums", "Summa", "Statuss"}, 0
         ));
+
+        filterButtons();
 
         add(new JScrollPane(table));
 
@@ -109,16 +118,20 @@ public class OrderPanel extends JPanel {
     }
 
     private void updateTable(List<Order> orders) {
-    DefaultTableModel model = (DefaultTableModel) table.getModel();
-    model.setRowCount(0);
+        try {
+            DefaultTableModel model = (DefaultTableModel) table.getModel();
+            model.setRowCount(0);
 
-        for (Order o : orders) {
-            model.addRow(new Object[]{
-                o.getId(),
-                o.getDate(),
-                o.getTotal(),
-                o.getStatId()
-            });
+                for (Order o : orders) {
+                    model.addRow(new Object[]{
+                        o.getId(),
+                        o.getDate(),
+                        o.getTotal(),
+                        statService.getStatusById(o.getStatId())
+                    });
+                }
+        } catch (Exception e) {
+            ErrorHandler.showError("Kļūda ielādējot", e);
         }
     }
 
@@ -129,5 +142,41 @@ public class OrderPanel extends JPanel {
         } catch (Exception e) {
             ErrorHandler.showError("Kļūda ielādējot", e);
         }
+    }
+
+    private void filterButtons() {
+        JPanel filterPanel = new JPanel(new GridLayout(1, 3, 20, 10));
+
+        JComboBox<Status> statusBox = new JComboBox<>();
+        JButton resetButton = btn.tableOption("Atcelt", color.editButton());
+
+        statusBox.addActionListener(e -> {
+            try {
+                Status sStatus = (Status) statusBox.getSelectedItem();
+                int StatusId = sStatus.getId();
+
+                List<Order> orders = service.getOrders(StatusId, null);
+                updateTable(orders);
+            } catch (Exception ex) {
+                ErrorHandler.showError("Kļūda", ex);
+            }
+        });
+
+        resetButton.addActionListener(e -> {
+            loadData();
+        });
+
+        try {
+            for (Status s : statService.getAllStatuses()) {
+                statusBox.addItem(s);
+            }
+        } catch (Exception e) {
+            ErrorHandler.showError("Kļūda ielādējot", e);
+        }
+
+        filterPanel.add(text.text2("Filtrēt pēc:"));
+        filterPanel.add(resetButton);
+        filterPanel.add(statusBox);
+        add(filterPanel);
     }
 }

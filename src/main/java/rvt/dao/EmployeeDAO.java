@@ -1,6 +1,7 @@
 package rvt.dao;
 
 import  rvt.model.Employee;
+import rvt.model.Order;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -99,5 +100,61 @@ public class EmployeeDAO {
         }
 
         return null;
+    }
+
+    public Employee getEmployeeById(Integer id) throws SQLException {
+        String sql = "SELECT * FROM darbinieki WHERE darbinieka_id = ?";
+
+        try (Connection conn = Database.connect();
+            PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setInt(1, id);
+
+            ResultSet rs = pstmt.executeQuery();
+
+            if (rs.next()) {
+                return new Employee(
+                    rs.getInt("darbinieka_id"),
+                    rs.getString("vards"),
+                    rs.getString("uzvards"),
+                    rs.getString("amats"),
+                    rs.getString("lietotajvards"),
+                    rs.getString("parole"),
+                    rs.getString("loma"));
+            }
+        }
+
+        return null; // not found
+    }
+
+    public List<Employee> getEmployeesByRole(String role) throws SQLException {
+
+        List<Employee> employees = new ArrayList<>();
+
+        String sql = "SELECT * FROM darbinieki WHERE loma = ?";
+
+        try (Connection conn = Database.connect();
+            PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setString(1, role);
+
+            ResultSet rs = pstmt.executeQuery();
+
+            while (rs.next()) {
+                Employee emp = new Employee(
+                    rs.getInt("darbinieka_id"),
+                    rs.getString("vards"),
+                    rs.getString("uzvards"),
+                    rs.getString("amats"),
+                    rs.getString("lietotajvards"),
+                    rs.getString("parole"),
+                    rs.getString("loma")
+                );
+
+                employees.add(emp);
+            }
+        }
+
+        return employees;
     }
 }

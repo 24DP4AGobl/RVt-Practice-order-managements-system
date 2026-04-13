@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.sql.*;
 
+import rvt.model.Order;
 import rvt.model.Status;
 
 public class StatusDAO {
@@ -60,5 +61,25 @@ public class StatusDAO {
             pstmt.setInt(1, Id);
             pstmt.executeUpdate();
         }
+    }
+
+    public Status getStatusById(Integer id) throws SQLException {
+        String sql = "SELECT * FROM statuss WHERE statusa_id = ?";
+
+        try (Connection conn = Database.connect();
+            PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setInt(1, id);
+
+            ResultSet rs = pstmt.executeQuery();
+
+            if (rs.next()) {
+                return new Status(
+                    rs.getInt("statusa_id"),
+                    rs.getString("nosaukums"));
+            }
+        }
+
+        return null; // not found
     }
 }

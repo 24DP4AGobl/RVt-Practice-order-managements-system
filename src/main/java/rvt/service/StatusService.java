@@ -33,4 +33,8 @@ public class StatusService {
     public void removeStatus(int id) throws SQLException {
         statusDAO.removeStatus(id);
     }
+
+    public Status getStatusById(int id) throws SQLException {
+        return statusDAO.getStatusById(id);
+    }
 }

@@ -6,20 +6,24 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 
 import rvt.model.Employee;
+import rvt.model.Order;
 import rvt.service.EmployeeService;
-//import EmployeeAdd;
-//import EmployeeEdit;
+import rvt.ui.DatabaseFunctionality.Employee.EmployeeAdd;
+import rvt.ui.DatabaseFunctionality.Employee.EmployeeEdit;
 
 import rvt.util.ButtonFormatting;
 import rvt.util.ErrorHandler;
+import rvt.util.TextFormatting;
 import rvt.util.UIColors;
 
 public class EmployeePanel extends JPanel {
 
     private JTable table;
     private EmployeeService service = new EmployeeService();
+    
     ButtonFormatting btn = new ButtonFormatting();
     UIColors color = new UIColors();
+    TextFormatting text = new TextFormatting();
 
     public EmployeePanel() {
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
@@ -28,6 +32,8 @@ public class EmployeePanel extends JPanel {
         table = new JTable(new DefaultTableModel(
             new Object[]{"ID", "Vārds", "Uzvārds", "Lietotājvārds", "Loma"}, 0
         ));
+
+        filterButtons();
 
         add(new JScrollPane(table));
 
@@ -39,9 +45,9 @@ public class EmployeePanel extends JPanel {
         JPanel content = new JPanel(cardLayout);
 
         content.add(new JPanel(), "nothing");
-        //content.add(new EmployeeAdd(), "add");
-        //OrderEdit edit = new EmployeeEdit();
-        //content.add(edit, "edit");
+        content.add(new EmployeeAdd(), "add");
+        EmployeeEdit edit = new EmployeeEdit();
+        content.add(edit, "edit");
 
         JButton addBtn = btn.tableOption("Pievienot", color.button2());
         addBtn.addActionListener(e -> cardLayout.show(content, "add"));
@@ -56,7 +62,7 @@ public class EmployeePanel extends JPanel {
                     int modelRow = table.convertRowIndexToModel(selectedRow);
                     int id = (int) table.getModel().getValueAt(modelRow, 0);
         
-                    //edit.setEmployeeId(id); 
+                    edit.setEmployeeId(id); 
 
                     cardLayout.show(content, "edit");
                     System.out.println("Selected ID: " + id);
@@ -131,5 +137,34 @@ public class EmployeePanel extends JPanel {
         } catch (Exception e) {
             ErrorHandler.showError("Kļūda ielādējot", e);
         }
+    }
+
+    private void filterButtons() {
+        JPanel filterPanel = new JPanel(new GridLayout(1, 3, 20, 10));
+
+        JTextField roleField = new JTextField();
+        JButton buttonField = btn.tableOption("Meklēt", color.editButton());
+        JButton resetButton = btn.tableOption("Atcelt", color.editButton());
+
+        buttonField.addActionListener(e -> {
+            try {
+                String role = roleField.getText();
+
+                List<Employee> employee = service.getEmployeesByRole(role);
+                updateTable(employee);
+            } catch (Exception ex) {
+                ErrorHandler.showError("Kļūda", ex);
+            }
+        });
+
+        resetButton.addActionListener(e -> {
+            loadData();
+        });
+
+        filterPanel.add(text.text2("Filtrēt pēc:"));
+        filterPanel.add(resetButton);
+        filterPanel.add(roleField);
+        filterPanel.add(buttonField);
+        add(filterPanel);
     }
 }

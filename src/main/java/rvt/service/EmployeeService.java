@@ -65,4 +65,12 @@ public class EmployeeService {
 
         return emp.getRole().equals("admin");
     }
+
+    public Employee getEmployeeById(int id) throws SQLException {
+        return employeeDAO.getEmployeeById(id);
+    }
+
+    public List<Employee> getEmployeesByRole(String role) throws SQLException {
+        return employeeDAO.getEmployeesByRole(role);
+    }
 }
