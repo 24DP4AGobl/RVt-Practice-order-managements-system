@@ -1,7 +1,6 @@
 package rvt.dao;
 
 import  rvt.model.Employee;
-import rvt.model.Order;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,7 +34,7 @@ public class EmployeeDAO {
 
     public void addEmployee(Employee employee) throws SQLException {
         try (Connection dbConn = Database.connect()) {
-            String sql = "INSERT INTO darbinieki(darbinieka_id, vards, uzvards, amats, lietotajvards, parole, loma) VALUES(?,?,?, ?)";
+            String sql = "INSERT INTO darbinieki(darbinieka_id, vards, uzvards, amats, lietotajvards, parole, loma) VALUES(?,?,?,?,?,?,?)";
 
             PreparedStatement pstmt = dbConn.prepareStatement(sql);
 

@@ -1,10 +1,9 @@
-package rvt.ui.DatabaseFunctionality.Category;
-
-import java.awt.GridLayout;
+package rvt.ui.DatabaseFunctionality.Status;
 
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.JButton;
+import java.awt.GridLayout;
 
 import rvt.util.FieldFormatting;
 import rvt.util.TextFormatting;
@@ -12,12 +11,12 @@ import rvt.util.ButtonFormatting;
 import rvt.util.ErrorHandler;
 import rvt.util.UIColors;
 
-import rvt.service.CategoryService;
-import rvt.model.Category;
+import rvt.service.StatusService;
+import rvt.model.Status;
 
-public class CategoryAdd extends JPanel {
-    
-    CategoryService service = new CategoryService();
+public class StatusEdit extends JPanel{
+        
+    StatusService service = new StatusService();
 
     private Runnable onSave;
 
@@ -26,22 +25,20 @@ public class CategoryAdd extends JPanel {
     ButtonFormatting btn = new ButtonFormatting();
     UIColors color = new UIColors();
 
-    private JTextField idField = field.size2();
     private JTextField nameField = field.size2();
+    private int id;
     private JButton cnfrmBtn = btn.tableOption("Akceptēt", color.button2());
 
-    public CategoryAdd(){
+    public StatusEdit() {
         setLayout(new GridLayout(3, 2, 80, 20));
 
-        add(text.text2("Id:"));
-        add(idField);
         add(text.text2("Nosaukums:"));
         add(nameField);
 
         cnfrmBtn.addActionListener(e -> {
             try {
-                Category cat = new Category(Integer.valueOf(idField.getText()), nameField.getText());
-                service.addCategory(cat);
+                Status cat = new Status(id, nameField.getText());
+                service.updateStatus(cat);
 
                 if (onSave != null) {
                     onSave.run();
@@ -52,6 +49,19 @@ public class CategoryAdd extends JPanel {
         });
 
         add(cnfrmBtn);
+    }
+
+    public void loadStatus(int id) {
+        this.id = id;
+
+        try {
+            Status oldInfo = service.getStatusById(id);
+
+            nameField.setText(oldInfo.getName());
+
+        } catch (Exception e) {
+            ErrorHandler.showError("Kļūda ielādējot kategoriju", e);
+        }
     }
 
     public void setOnSave(Runnable onSave) {

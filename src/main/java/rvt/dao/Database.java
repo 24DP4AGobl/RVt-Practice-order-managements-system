@@ -57,6 +57,8 @@ public class Database {
                 + "FOREIGN KEY(kategorijas_id) REFERENCES kategorijas(kategorijas_id),"
                 + "FOREIGN KEY (piegadatajs_id) REFERENCES piegadataji(piegadataja_id))"; 
 
+        String dropProducts = "DROP TABLE produkti";
+
         try (Connection conn = connect();
              Statement stmt = conn.createStatement()) {
 
@@ -66,7 +68,7 @@ public class Database {
             stmt.execute(statusTable);
             stmt.execute(ordersTable);
             stmt.execute(productTable);
-            //stmt.execute("DROP TABLE orders");
+            //stmt.execute(dropProducts);
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -97,11 +99,11 @@ public class Database {
                 """);
 
                 // Products
-                stmt.executeUpdate("""
-                INSERT INTO produkti(nosaukums, cena, daudzums)
-                VALUES ('Telefons', 299.99, 10),
-                        ('Maize', 1.20, 50)
-                """);
+                //stmt.executeUpdate("""
+                //INSERT INTO produkti(nosaukums, cena, daudzums)
+                //VALUES ('Telefons', 299.99, 10),
+                //        ('Maize', 1.20, 50)
+                //""");
 
                 // Orders
                 stmt.executeUpdate("""

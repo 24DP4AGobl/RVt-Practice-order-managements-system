@@ -7,13 +7,10 @@ import java.awt.*;
 
 import rvt.model.Status;
 import rvt.service.StatusService;
-//import StatusAdd;
-//import StatusEdit;
+import rvt.ui.DatabaseFunctionality.Status.*;
 import rvt.util.ButtonFormatting;
 import rvt.util.UIColors;
 import rvt.util.ErrorHandler;
-import rvt.util.ButtonFormatting;
-import rvt.util.UIColors;
 
 public class StatusPanel extends JPanel {
             
@@ -40,9 +37,11 @@ public class StatusPanel extends JPanel {
         JPanel content = new JPanel(cardLayout);
 
         content.add(new JPanel(), "nothing");
-        //content.add(new StatusAdd(), "add");
-        //StatusEdit edit = new StatusEdit();
-        //content.add(statusEdit, "edit");
+        StatusAdd add = new StatusAdd();
+        content.add(add, "add");
+
+        StatusEdit edit = new StatusEdit();
+        content.add(edit, "edit");
 
         JButton addBtn = btn.tableOption("Pievienot", color.button2());
         addBtn.addActionListener(e -> cardLayout.show(content, "add"));
@@ -56,7 +55,7 @@ public class StatusPanel extends JPanel {
                     int modelRow = table.convertRowIndexToModel(selectedRow);
                     int id = (int) table.getModel().getValueAt(modelRow, 0);
         
-                    //edit.setCategoryId(id); 
+                    edit.loadStatus(id); 
 
                     cardLayout.show(content, "edit");
                     System.out.println("Selected ID: " + id);

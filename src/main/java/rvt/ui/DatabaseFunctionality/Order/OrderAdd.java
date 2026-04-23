@@ -23,7 +23,7 @@ import rvt.service.ProductService;
 import rvt.model.Order;
 import rvt.model.Product;
 import rvt.model.Status;
-import rvt.model.Employee;;
+import rvt.model.Employee;
 
 public class OrderAdd extends JPanel {
     
@@ -31,6 +31,8 @@ public class OrderAdd extends JPanel {
     StatusService statService = new StatusService();
     EmployeeService employeeService = new EmployeeService();
     ProductService productService = new ProductService();
+
+    private Runnable onSave;
 
     TextFormatting text = new TextFormatting();
     FieldFormatting field = new FieldFormatting();
@@ -103,11 +105,19 @@ public class OrderAdd extends JPanel {
                                         ProductId
                                     );
                 service.addOrder(order);
+
+                if (onSave != null) {
+                    onSave.run();
+                }
             } catch (Exception ex) {
                 ErrorHandler.showError("Kļūda saglabājot kategoriju", ex);
             }
         });
 
         add(cnfrmBtn);
+    }
+
+    public void setOnSave(Runnable onSave) {
+        this.onSave = onSave;
     }
 }

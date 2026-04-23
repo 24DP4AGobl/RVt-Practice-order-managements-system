@@ -18,6 +18,8 @@ public class CategoryEdit extends JPanel{
         
     CategoryService service = new CategoryService();
 
+    private Runnable onSave;
+
     TextFormatting text = new TextFormatting();
     FieldFormatting field = new FieldFormatting();
     ButtonFormatting btn = new ButtonFormatting();
@@ -37,6 +39,10 @@ public class CategoryEdit extends JPanel{
             try {
                 Category cat = new Category(id, nameField.getText());
                 service.updateCategory(cat);
+
+                if (onSave != null) {
+                    onSave.run();
+                }
             } catch (Exception ex) {
                 ErrorHandler.showError("Kļūda saglabājot kategoriju", ex);
             }
@@ -45,7 +51,20 @@ public class CategoryEdit extends JPanel{
         add(cnfrmBtn);
     }
 
-    public void setCategoryId(int id) {
+    public void loadCategory(int id) {
         this.id = id;
+
+        try {
+            Category oldInfo = service.getCategoryById(id);
+
+            nameField.setText(oldInfo.getName());
+
+        } catch (Exception e) {
+            ErrorHandler.showError("Kļūda ielādējot kategoriju", e);
+        }
+    }
+
+    public void setOnSave(Runnable onSave) {
+        this.onSave = onSave;
     }
 }

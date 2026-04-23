@@ -33,4 +33,8 @@ public class CategoryService {
     public void removeCategory(int id) throws SQLException {
         categoryDAO.removeCategory(id);
     }
+
+    public Category getCategoryById(int Id) throws SQLException {
+        return categoryDAO.getCategoryById(Id);
+    }
 }

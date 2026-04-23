@@ -44,8 +44,6 @@ public class AdminPanel extends JPanel {
         sideBar.add(Box.createRigidArea(new Dimension(0, 10)));
         sideBar.add(employeesBtn);
         sideBar.add(Box.createRigidArea(new Dimension(0, 10)));
-        sideBar.add(ordersBtn);
-        sideBar.add(Box.createRigidArea(new Dimension(0, 10)));
         sideBar.add(delivererBtn);
         sideBar.add(Box.createRigidArea(new Dimension(0, 30)));
 
@@ -55,9 +53,6 @@ public class AdminPanel extends JPanel {
         sideBar.add(Box.createRigidArea(new Dimension(0, 10)));
         sideBar.add(statusBtn);
         sideBar.add(Box.createRigidArea(new Dimension(0, 30)));
-
-        // 🔹 Content
-        //JPanel content = new JPanel(new BorderLayout());
 
         CardLayout cardLayout = new CardLayout();
         JPanel content = new JPanel(cardLayout);
@@ -75,9 +70,6 @@ public class AdminPanel extends JPanel {
         content.add(new DelivererPanel(), "deliverers");
         delivererBtn.addActionListener(e -> cardLayout.show(content, "deliverers"));
 
-        content.add(new OrderPanel(), "orders");
-        ordersBtn.addActionListener(e -> cardLayout.show(content, "orders"));
-
         content.add(new CategoryPanel(), "categories");
         catBtn.addActionListener(e -> cardLayout.show(content, "categories"));
 
@@ -86,33 +78,7 @@ public class AdminPanel extends JPanel {
 
         scroll.add(content);
 
-        // 🔹 Top filter bar
-        //JPanel filterPanel = new JPanel();
-
-        //JButton allBtn = new JButton("Visi");
-        //JButton activeBtn = new JButton("Aktīvie");
-        //JButton doneBtn = new JButton("Pabeigti");
-
-        //filterPanel.add(allBtn);
-        //filterPanel.add(activeBtn);
-        //filterPanel.add(doneBtn);
-
-        // 🔹 Table (placeholder)
-        //String[] columns = {"ID", "Datums", "Summa", "Statuss"};
-        //Object[][] data = {};
-
-        //JTable table = new JTable(data, columns);
-        //JScrollPane scrollPane = new JScrollPane(table);
-
-        //content.add(filterPanel, BorderLayout.NORTH);
-        //content.add(scrollPane, BorderLayout.CENTER);
-
         add(sideBar, BorderLayout.WEST);
         add(content, BorderLayout.CENTER);
-
-        // 🔥 Filter logic (mock)
-        //allBtn.addActionListener(e -> System.out.println("Visi"));
-        //activeBtn.addActionListener(e -> System.out.println("Aktīvie"));
-        //doneBtn.addActionListener(e -> System.out.println("Pabeigti"));
     }
 }

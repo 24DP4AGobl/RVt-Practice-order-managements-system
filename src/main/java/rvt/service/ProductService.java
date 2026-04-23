@@ -58,4 +58,12 @@ public class ProductService {
     public void removeProduct(int id) throws SQLException {
         productDAO.removeProduct(id);
     }
+
+    public Product getProductById(int id) throws SQLException {
+        return productDAO.getProductById(id);
+    }
+
+    public List<Product> getProducts(Integer catId, Integer delId) throws SQLException{
+        return productDAO.getProducts(catId, delId);
+    }
 }

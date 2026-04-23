@@ -7,8 +7,7 @@ import java.awt.*;
 
 import rvt.model.Deliverer;
 import rvt.service.DelivererService;
-//import DelivererAdd;
-//import DelivererEdit;
+import rvt.ui.DatabaseFunctionality.Deliverer.*;
 
 import rvt.util.ButtonFormatting;
 import rvt.util.ErrorHandler;
@@ -39,9 +38,18 @@ public class DelivererPanel extends JPanel{
         JPanel content = new JPanel(cardLayout);
 
         content.add(new JPanel(), "nothing");
-        //content.add(new DelivererAdd(), "add");
-        //OrderEdit edit = new DelivererEdit();
-        //content.add(edit, "edit");
+        DelivererAdd add = new DelivererAdd();
+        add.setOnSave(() -> {
+            loadData();
+            cardLayout.show(content, "nothing");
+        });
+        content.add(add, "add");
+        DelivererEdit edit = new DelivererEdit();
+        edit.setOnSave(() -> {
+            loadData();
+            cardLayout.show(content, "nothing");
+        });
+        content.add(edit, "edit");
 
         JButton addBtn = btn.tableOption("Pievienot", color.button2());
         addBtn.addActionListener(e -> cardLayout.show(content, "add"));
@@ -56,7 +64,7 @@ public class DelivererPanel extends JPanel{
                     int modelRow = table.convertRowIndexToModel(selectedRow);
                     int id = (int) table.getModel().getValueAt(modelRow, 0);
         
-                    //edit.setDelivererId(id); 
+                    edit.loadDeliverer(id); 
 
                     cardLayout.show(content, "edit");
                     System.out.println("Selected ID: " + id);

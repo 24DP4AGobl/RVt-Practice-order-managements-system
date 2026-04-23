@@ -18,6 +18,8 @@ public class EmployeeAdd extends JPanel{
     
     EmployeeService service = new EmployeeService();
 
+    private Runnable onSave;
+
     TextFormatting text = new TextFormatting();
     FieldFormatting field = new FieldFormatting();
     ButtonFormatting btn = new ButtonFormatting();
@@ -63,11 +65,19 @@ public class EmployeeAdd extends JPanel{
                                         roleField.getText()
                                     );
                 service.addEmployee(employee);
+
+                if (onSave != null) {
+                    onSave.run();
+                }
             } catch (Exception ex) {
-                ErrorHandler.showError("Kļūda saglabājot kategoriju", ex);
+                ErrorHandler.showError("Kļūda saglabājot darbinieku", ex);
             }
         });
 
         add(cnfrmBtn);
+    }
+
+    public void setOnSave(Runnable onSave) {
+        this.onSave = onSave;
     }
 }

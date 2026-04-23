@@ -1,4 +1,4 @@
-package rvt.ui.DatabaseFunctionality.Category;
+package rvt.ui.DatabaseFunctionality.Status;
 
 import java.awt.GridLayout;
 
@@ -12,12 +12,12 @@ import rvt.util.ButtonFormatting;
 import rvt.util.ErrorHandler;
 import rvt.util.UIColors;
 
-import rvt.service.CategoryService;
-import rvt.model.Category;
+import rvt.service.StatusService;
+import rvt.model.Status;
 
-public class CategoryAdd extends JPanel {
+public class StatusAdd extends JPanel {
     
-    CategoryService service = new CategoryService();
+    StatusService service = new StatusService();
 
     private Runnable onSave;
 
@@ -30,7 +30,7 @@ public class CategoryAdd extends JPanel {
     private JTextField nameField = field.size2();
     private JButton cnfrmBtn = btn.tableOption("Akceptēt", color.button2());
 
-    public CategoryAdd(){
+    public StatusAdd(){
         setLayout(new GridLayout(3, 2, 80, 20));
 
         add(text.text2("Id:"));
@@ -40,8 +40,8 @@ public class CategoryAdd extends JPanel {
 
         cnfrmBtn.addActionListener(e -> {
             try {
-                Category cat = new Category(Integer.valueOf(idField.getText()), nameField.getText());
-                service.addCategory(cat);
+                Status status = new Status(Integer.valueOf(idField.getText()), nameField.getText());
+                service.addStatus(status);
 
                 if (onSave != null) {
                     onSave.run();

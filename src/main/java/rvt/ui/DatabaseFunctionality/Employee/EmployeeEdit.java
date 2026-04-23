@@ -3,7 +3,6 @@ package rvt.ui.DatabaseFunctionality.Employee;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.JButton;
-import javax.swing.JComboBox;
 
 import java.awt.GridLayout;
 
@@ -25,13 +24,16 @@ public class EmployeeEdit extends JPanel{
     ButtonFormatting btn = new ButtonFormatting();
     UIColors color = new UIColors();
 
+    private Runnable onSave;
+
     private int id;
-    private JButton cnfrmBtn = btn.tableOption("Akceptēt", color.button2());
 
     private JTextField positionField = field.size2();
     private JTextField usernameField = field.size2();
     private JTextField passwordField = field.size2();
     private JTextField roleField = field.size2();
+
+    private JButton cnfrmBtn = btn.tableOption("Akceptēt", color.button2());
 
     public EmployeeEdit() {
         setLayout(new GridLayout(5, 2, 80, 20));
@@ -52,15 +54,35 @@ public class EmployeeEdit extends JPanel{
 
                 Employee employee = new Employee(id, oldInfo.getName(), oldInfo.getSurname(), positionField.getText(), usernameField.getText(), passwordField.getText(), roleField.getText());
                 service.updateEmployee(employee);
+
+                if (onSave != null) {
+                    onSave.run();
+                }
             } catch (Exception ex) {
-                ErrorHandler.showError("Kļūda saglabājot pasūtījumu", ex);
+                ErrorHandler.showError("Kļūda saglabājot darbinieku", ex);
             }
         });
 
         add(cnfrmBtn);
     }
 
-    public void setEmployeeId(int id) {
+    public void loadEmployee(int id) {
         this.id = id;
+
+        try {
+            Employee oldInfo = service.getEmployeeById(id);
+
+            positionField.setText(oldInfo.getPosition());
+            usernameField.setText(oldInfo.getUsername());
+            passwordField.setText(oldInfo.getPassword());
+            roleField.setText(oldInfo.getRole());
+
+        } catch (Exception e) {
+            ErrorHandler.showError("Kļūda ielādējot produktu", e);
+        }
+    }
+
+    public void setOnSave(Runnable onSave) {
+        this.onSave = onSave;
     }
 }

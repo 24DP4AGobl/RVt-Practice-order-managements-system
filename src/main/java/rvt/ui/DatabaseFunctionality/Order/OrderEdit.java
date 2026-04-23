@@ -23,18 +23,20 @@ public class OrderEdit extends JPanel{
     StatusService statService = new StatusService();
     OrderService service = new OrderService();
 
+    private Runnable onSave;
+
     TextFormatting text = new TextFormatting();
     FieldFormatting field = new FieldFormatting();
     ButtonFormatting btn = new ButtonFormatting();
     UIColors color = new UIColors();
 
     private int id;
+    JComboBox<Status> statusBox = new JComboBox<>();
+
     private JButton cnfrmBtn = btn.tableOption("Akceptēt", color.button2());
 
     public OrderEdit() {
         setLayout(new GridLayout(3, 2, 80, 20));
-
-        JComboBox<Status> statusBox = new JComboBox<>();
 
         try {
             for (Status s : statService.getAllStatuses()) {
@@ -56,6 +58,10 @@ public class OrderEdit extends JPanel{
 
                 Order order = new Order(id, oldInfo.getDate(), oldInfo.getTotal(), oldInfo.getAmount(), StatusId, oldInfo.getEmplId(), oldInfo.getProdlId());
                 service.updateOrder(order);
+
+                if (onSave != null) {
+                    onSave.run();
+                }
             } catch (Exception ex) {
                 ErrorHandler.showError("Kļūda saglabājot pasūtījumu", ex);
             }
@@ -64,7 +70,24 @@ public class OrderEdit extends JPanel{
         add(cnfrmBtn);
     }
 
-    public void setOrderId(int id) {
+    public void loadOrder(int id) {
         this.id = id;
+
+        try {
+            Order oldInfo = service.getOrderById(id);
+
+            for (int i = 0; i < statusBox.getItemCount(); i++) {
+                if (statusBox.getItemAt(i).getId() == oldInfo.getStatId()) {
+                    statusBox.setSelectedIndex(i);
+                    break;
+                }
+            }
+        } catch (Exception e) {
+            ErrorHandler.showError("Kļūda ielādējot produktu", e);
+        }
+    }
+
+    public void setOnSave(Runnable onSave) {
+        this.onSave = onSave;
     }
 }

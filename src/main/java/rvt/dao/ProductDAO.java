@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.sql.*;
 
+import rvt.model.Order;
 import rvt.model.Product;
 
 public class ProductDAO {
@@ -21,8 +22,8 @@ public class ProductDAO {
                 Product product = new Product(rs.getInt("produkta_id"),
                                         rs.getString("nosaukums"),
                                         new BigDecimal(rs.getString("cena")),
-                                        rs.getInt("daudzums"),
                                         rs.getInt("kategorijas_id"),
+                                        rs.getInt("daudzums"),
                                         rs.getInt("piegadatajs_id")
                                         );
                 products.add(product);
@@ -73,5 +74,74 @@ public class ProductDAO {
             pstmt.setInt(1, Id);
             pstmt.executeUpdate();
         }
+    }
+
+    public Product getProductById(int Id) throws SQLException {
+        String sql = "SELECT * FROM produkti WHERE produkta_id = ?";
+
+        try (Connection conn = Database.connect();
+            PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setInt(1, Id);
+
+            ResultSet rs = pstmt.executeQuery();
+
+            if (rs.next()) {
+                return new Product(
+                    rs.getInt("produkta_id"),
+                    rs.getString("nosaukums"),
+                    new BigDecimal(rs.getString("cena")),
+                    rs.getInt("kategorijas_id"),
+                    rs.getInt("daudzums"),
+                    rs.getInt("piegadatajs_id")
+                );
+            }
+        }
+
+        return null; // not found
+    }
+
+    public List<Product> getProducts(Integer catId, Integer delId) throws SQLException {
+
+        List<Product> products = new ArrayList<>();
+
+        StringBuilder sql = new StringBuilder("SELECT * FROM produkti WHERE 1=1");
+
+        if (catId != null) {
+            sql.append(" AND kategorijas_id = ?");
+        }
+
+        if (delId != null) {
+            sql.append(" AND piegadatajs_id = ?");
+        }
+
+        try (Connection conn = Database.connect();
+            PreparedStatement pstmt = conn.prepareStatement(sql.toString())) {
+
+            int index = 1;
+
+            if (catId != null) {
+                pstmt.setInt(index++, catId);
+            }
+
+            if (delId != null) {
+                pstmt.setInt(index++, delId);
+            }
+
+            ResultSet rs = pstmt.executeQuery();
+
+            while (rs.next()) {
+                Product product = new Product(rs.getInt("produkta_id"),
+                                rs.getString("nosaukums"),
+                                new BigDecimal(rs.getString("cena")),
+                                rs.getInt("kategorijas_id"),
+                                rs.getInt("daudzums"),
+                                rs.getInt("piegadatajs_id")
+                                );
+                products.add(product);
+            }
+        }
+
+        return products;
     }
 }

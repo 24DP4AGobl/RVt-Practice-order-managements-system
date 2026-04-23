@@ -45,4 +45,16 @@ public class UIColors {
     public Color loginBakground() {
         return new Color(179, 212, 242);
     }
+
+    public Color low() {
+        return new Color(196, 74, 58);
+    }
+
+    public Color medium() {
+        return new Color(242, 212, 121);
+    }
+
+    public Color high() {
+        return new Color(111, 175, 79);
+    }
 }

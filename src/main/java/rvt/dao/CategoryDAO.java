@@ -5,6 +5,7 @@ import java.util.List;
 import java.sql.*;
 
 import rvt.model.Category;
+import rvt.model.Employee;
 
 public class CategoryDAO {
     
@@ -60,5 +61,26 @@ public class CategoryDAO {
             pstmt.setInt(1, Id);
             pstmt.executeUpdate();
         }
+    }
+
+    public Category getCategoryById(int Id) throws SQLException {
+        String sql = "SELECT * FROM kategorijas WHERE kategorijas_id = ?";
+
+        try (Connection conn = Database.connect();
+            PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setInt(1, Id);
+
+            ResultSet rs = pstmt.executeQuery();
+
+            if (rs.next()) {
+                return new Category(
+                    rs.getInt("kategorijas_id"),
+                    rs.getString("nosaukums")
+                );
+            }
+        }
+
+        return null; // not found
     }
 }

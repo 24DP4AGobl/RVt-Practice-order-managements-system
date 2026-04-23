@@ -47,8 +47,18 @@ public class OrderPanel extends JPanel {
         JPanel content = new JPanel(cardLayout);
 
         content.add(new JPanel(), "nothing");
-        content.add(new OrderAdd(), "add");
+        OrderAdd add = new OrderAdd();
+        add.setOnSave(() -> {
+            loadData();
+            cardLayout.show(content, "nothing");
+        });
+        content.add(add, "add");
+
         OrderEdit edit = new OrderEdit();
+        edit.setOnSave(() -> {
+            loadData();
+            cardLayout.show(content, "nothing");
+        });
         content.add(edit, "edit");
 
         JButton addBtn = btn.tableOption("Pievienot", color.button2());
@@ -64,7 +74,7 @@ public class OrderPanel extends JPanel {
                     int modelRow = table.convertRowIndexToModel(selectedRow);
                     int id = (int) table.getModel().getValueAt(modelRow, 0);
         
-                    edit.setOrderId(id); 
+                    edit.loadOrder(id);
 
                     cardLayout.show(content, "edit");
                     System.out.println("Selected ID: " + id);

@@ -37,9 +37,19 @@ public class CategoryPanel extends JPanel {
         JPanel content = new JPanel(cardLayout);
 
         content.add(new JPanel(), "nothing");
-        content.add(new CategoryAdd(), "add");
-        CategoryEdit categoryEdit = new CategoryEdit();
-        content.add(categoryEdit, "edit");
+        CategoryAdd add = new CategoryAdd();
+        add.setOnSave(() -> {
+            loadData();
+            cardLayout.show(content, "nothing");
+        });
+        content.add(add, "add");
+
+        CategoryEdit edit = new CategoryEdit();
+        edit.setOnSave(() -> {
+            loadData();
+            cardLayout.show(content, "nothing");
+        });
+        content.add(edit, "edit");
 
         JButton addBtn = btn.tableOption("Pievienot", color.button2());
         addBtn.addActionListener(e -> cardLayout.show(content, "add"));
@@ -53,7 +63,7 @@ public class CategoryPanel extends JPanel {
                     int modelRow = table.convertRowIndexToModel(selectedRow);
                     int id = (int) table.getModel().getValueAt(modelRow, 0);
         
-                    categoryEdit.setCategoryId(id); 
+                    edit.loadCategory(id); 
 
                     cardLayout.show(content, "edit");
                     System.out.println("Selected ID: " + id);

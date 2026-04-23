@@ -5,6 +5,7 @@ import java.util.List;
 
 import rvt.dao.DelivererDAO;
 import rvt.model.Deliverer;
+import rvt.model.Employee;
 
 public class DelivererService {
     
@@ -48,5 +49,9 @@ public class DelivererService {
 
     public void removeDeliverer(int id) throws SQLException {
         delivererDAO.removerDeliverer(id);
+    }
+
+    public Deliverer getDelivererById(int id) throws SQLException {
+        return delivererDAO.getDelivererById(id);
     }
 }

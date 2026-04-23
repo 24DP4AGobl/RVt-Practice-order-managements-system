@@ -1,6 +1,7 @@
 package rvt.dao;
 
 import rvt.model.Deliverer;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.sql.*;
@@ -46,7 +47,7 @@ public class DelivererDAO {
 
     public void updateDeliverer(Deliverer deliverer) throws SQLException {
         try (Connection conn3 = Database.connect()) {
-            String sql = "UPDATE piegadataji SET nosaukums=?, talrunis=?, email=? WHERE piegadataja_id=?";
+            String sql = "UPDATE piegadataji SET nosaukums=?, talrunis=?, epasts=? WHERE piegadataja_id=?";
             PreparedStatement pstmt = conn3.prepareStatement(sql);
 
             pstmt.setString(1, deliverer.getName());
@@ -66,5 +67,28 @@ public class DelivererDAO {
             pstmt.setInt(1, Id);
             pstmt.executeUpdate();
         }
+    }
+
+    public Deliverer getDelivererById(Integer id) throws SQLException {
+        String sql = "SELECT * FROM piegadataji WHERE piegadataja_id = ?";
+
+        try (Connection conn = Database.connect();
+            PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setInt(1, id);
+
+            ResultSet rs = pstmt.executeQuery();
+
+            if (rs.next()) {
+                return new Deliverer(
+                    rs.getInt("piegadataja_id"),
+                    rs.getString("nosaukums"),
+                    rs.getString("talrunis"),
+                    rs.getString("epasts")
+                );
+            }
+        }
+
+        return null; // not found
     }
 }

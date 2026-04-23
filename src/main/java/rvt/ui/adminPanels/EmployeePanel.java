@@ -6,7 +6,6 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 
 import rvt.model.Employee;
-import rvt.model.Order;
 import rvt.service.EmployeeService;
 import rvt.ui.DatabaseFunctionality.Employee.EmployeeAdd;
 import rvt.ui.DatabaseFunctionality.Employee.EmployeeEdit;
@@ -45,8 +44,17 @@ public class EmployeePanel extends JPanel {
         JPanel content = new JPanel(cardLayout);
 
         content.add(new JPanel(), "nothing");
+        EmployeeAdd add = new EmployeeAdd();
+        add.setOnSave(() -> {
+            loadData();
+            cardLayout.show(content, "nothing");
+        });
         content.add(new EmployeeAdd(), "add");
         EmployeeEdit edit = new EmployeeEdit();
+        edit.setOnSave(() -> {
+            loadData();
+            cardLayout.show(content, "nothing");
+        });
         content.add(edit, "edit");
 
         JButton addBtn = btn.tableOption("Pievienot", color.button2());
@@ -62,7 +70,7 @@ public class EmployeePanel extends JPanel {
                     int modelRow = table.convertRowIndexToModel(selectedRow);
                     int id = (int) table.getModel().getValueAt(modelRow, 0);
         
-                    edit.setEmployeeId(id); 
+                    edit.loadEmployee(id); 
 
                     cardLayout.show(content, "edit");
                     System.out.println("Selected ID: " + id);

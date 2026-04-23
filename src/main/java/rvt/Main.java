@@ -5,7 +5,7 @@ import rvt.dao.Database;
 
 public class Main {
     public static void main(String[] args) {
-        new LoginInterface(); // start with login
+        new LoginInterface(); // sāk ar ielogošanā ekrānu
 
         Database.createTables();
     }

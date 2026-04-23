@@ -6,11 +6,13 @@ import java.awt.*;
 import rvt.util.UIColors;
 import rvt.model.Employee;
 import rvt.util.UtilPanels;
+import rvt.util.WarningManager;
 
 public class MainFrame extends JFrame{
 
     UIColors color = new UIColors();
     UtilPanels panels = new UtilPanels();
+    WarningManager warning = new WarningManager();
     CardLayout cardLayout = new CardLayout();
     JPanel mainPanel = new JPanel(cardLayout);
 
@@ -27,7 +29,15 @@ public class MainFrame extends JFrame{
         topBar.setBackground(color.topBar());
         topBar.setPreferredSize(new Dimension(0, 50));
         topBar.setBorder(BorderFactory.createEmptyBorder(3, 3, 3, 3));
+        JButton logout = new JButton("Izlogoties");
+        logout.addActionListener(e -> {
+            dispose();
+            new LoginInterface();
+        });
+
+        topBar.add(warning);
         topBar.add(panels.userPanel(employee));
+        topBar.add(logout);
         add(topBar, BorderLayout.NORTH);
 
         if (employee.getRole().equals("admin")) {
